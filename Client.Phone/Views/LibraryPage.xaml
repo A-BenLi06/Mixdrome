@@ -1,8 +1,11 @@
 <Page x:Class="Mixdrome.Phone.Views.LibraryPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+      xmlns:common="using:Mixdrome.Phone.Common"
+      Background="Black">
     <Page.Resources>
+        <Thickness x:Key="PivotHeaderItemMargin">0,-6.5,0,0</Thickness>
+        <DataTemplate x:Key="LibraryHeadingTemplate"><TextBlock Text="{Binding}" FontSize="54" FontFamily="{StaticResource PhoneReferenceSemiLightFontFamily}" FontWeight="SemiLight" CharacterSpacing="0" /></DataTemplate>
         <Style x:Key="LibraryPlayButtonStyle" TargetType="Button" BasedOn="{StaticResource CircularButtonStyle}">
             <Setter Property="Width" Value="44" /><Setter Property="Height" Value="44" />
             <Setter Property="MinWidth" Value="44" /><Setter Property="MinHeight" Value="44" />
@@ -74,8 +77,8 @@
     </Page.BottomAppBar>
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-        <TextBlock x:Uid="PhoneUi_Text_MyMusic" Style="{StaticResource BodyTextStyle}" Foreground="White" Margin="20,12,20,0" />
-        <Pivot x:Name="LibraryPivot" Grid.Row="1" SelectionChanged="OnTabChanged">
+        <common:PhoneTitleBar x:Name="SectionBar" />
+        <Pivot x:Name="LibraryPivot" Grid.Row="1" HeaderTemplate="{StaticResource LibraryHeadingTemplate}" SelectionChanged="OnTabChanged">
             <PivotItem x:Uid="PhoneUi_Header_Artists" Tag="artists"><ListView ItemsSource="{Binding Artists}" ItemTemplate="{StaticResource LibraryNamedRowTemplate}" ItemContainerStyle="{StaticResource LibraryItemContainerStyle}" SelectionMode="None" /></PivotItem>
             <PivotItem x:Uid="PhoneUi_Header_Albums" Tag="albums"><ListView ItemsSource="{Binding Albums}" ItemTemplate="{StaticResource LibraryAlbumRowTemplate}" ItemContainerStyle="{StaticResource LibraryItemContainerStyle}" SelectionMode="None" /></PivotItem>
             <PivotItem x:Uid="PhoneUi_Header_Songs" Tag="songs">

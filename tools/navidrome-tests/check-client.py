@@ -153,6 +153,15 @@ if uses_inline_search:
         path = client / node.get('Include').replace('\\', '/')
         if path.is_file() and re.search(r'\bSearchPane\s*\.\s*GetForCurrentView\s*\(', path.read_text(encoding='utf-8-sig')):
             issues.append('Inline SearchBox conflicts with legacy SearchPane initialization: ' + str(path.relative_to(root)))
+for view_relative in ('Main/MainView.xaml', 'Navidrome/NavidromePlayerView.xaml'):
+    view_doc = ET.parse(client / view_relative).getroot()
+    named = {node.get(xaml_namespace + 'Name'): node for node in view_doc.iter() if node.get(xaml_namespace + 'Name')}
+    drawer = named.get('QueueDrawer')
+    dismiss = named.get('QueueDismiss')
+    if drawer is None or drawer.get('HorizontalAlignment') != 'Left':
+        issues.append('QueueDrawer must align Left to match left pane transition: ' + view_relative)
+    if dismiss is None or dismiss.get('Style') != '{StaticResource MixRadioDismissButtonStyle}':
+        issues.append('QueueDismiss must use MixRadioDismissButtonStyle: ' + view_relative)
 if issues:
     raise SystemExit('\n'.join(issues))
 print('PASS:', lookups, 'desktop string lookups,', static_lookups,

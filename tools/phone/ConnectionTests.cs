@@ -68,18 +68,22 @@ public static class PhoneConnectionTests
         var normalized = Config("music.example.com/navidrome"); PhoneSettings.Validate(normalized);
         Check(normalized.PrimaryUrl == "http://music.example.com/navidrome/", "A bare address is normalized while preserving its server path.");
 
-        var owner = "fixture"; var fail = false;
+        var owner = "fixture"; var fail = false; var enhancedLyrics = true; var externalArtistImage = true;
         using (var bad = new ProtocolServer(request => new ProtocolResponse { Body = Response("<error code='40' message='Denied'/>", false) }))
         using (var good = new ProtocolServer(request =>
         {
             var path = request.Uri.AbsolutePath;
             if (path.EndsWith("tokenInfo.view")) return new ProtocolResponse { Body = Response("<tokenInfo username='" + owner + "'/>") };
             if (fail) return new ProtocolResponse { Body = Response("<error code='40' message='Denied'/>", false) };
+            if (path.EndsWith("getOpenSubsonicExtensions.view")) return new ProtocolResponse { Body = enhancedLyrics ? Response("<openSubsonicExtensions name='songLyrics'><versions>1</versions></openSubsonicExtensions>") : Response("<error code='70' message='Not implemented'/>", false) };
+            if (path.EndsWith("getLyricsBySongId.view")) return new ProtocolResponse { Body = Response("<lyricsList><structuredLyrics lang='en' synced='false'><line>Structured line</line></structuredLyrics></lyricsList>") };
+            if (path.EndsWith("getLyrics.view")) return new ProtocolResponse { Body = Response("<lyrics artist='Artist' title='Track'>Legacy line</lyrics>") };
+            if (path.EndsWith("getArtistInfo2.view")) return new ProtocolResponse { Body = Response(externalArtistImage ? "<artistInfo2><biography>Real biography</biography><largeImageUrl>https://images.invalid/artist.jpg</largeImageUrl></artistInfo2>" : "<artistInfo2><biography>Real biography</biography><largeImageUrl></largeImageUrl></artistInfo2>") };
             if (path.EndsWith("getAlbum.view")) return new ProtocolResponse { Body = Response("<album id='album' name='Album' artist='Artist'><song id='song&amp;音' title='Track' artist='Artist' album='Album' track='7' duration='125' bitRate='192' contentType='audio/flac' /></album>") };
             if (path.EndsWith("getStarred2.view")) return new ProtocolResponse { Body = Response("<starred2><song id='starred' title='Starred' duration='30' /></starred2>") };
             if (path.EndsWith("getInternetRadioStations.view")) return new ProtocolResponse { Body = Response("<internetRadioStations><internetRadioStation id='radio' name='Station' streamUrl='https://radio.example.com/' homePageUrl='https://example.com/' /></internetRadioStations>") };
             if (path.EndsWith("getNowPlaying.view")) return new ProtocolResponse { Body = Response("<nowPlaying><entry id='playing' title='Playing' duration='65' username='listener' playerId='2' minutesAgo='1' /></nowPlaying>") };
-            if (path.EndsWith("getArtist.view")) return new ProtocolResponse { Body = Response("<artist id='artist' name='Artist'><album id='album' name='Album' artist='Artist' year='2005' songCount='8' /></artist>") };
+            if (path.EndsWith("getArtist.view")) return new ProtocolResponse { Body = Response("<artist id='artist' name='Artist' artistImageUrl='https://images.invalid/local-artist.jpg'><album id='album' name='Album' artist='Artist' year='2005' songCount='8' /></artist>") };
             return new ProtocolResponse { Body = Response("") };
         }))
         {
@@ -96,6 +100,16 @@ public static class PhoneConnectionTests
             Check((await adapter.GetAlbumsAsync("artist")).Single().Year == 2005, "Artist albums retain year and song counts.");
             Check((await adapter.GetInternetRadioStationsAsync()).Single().StreamUrl == "https://radio.example.com/", "Radio adapts server-defined streams.");
             Check((await adapter.GetNowPlayingAsync()).Single().Song.Duration == 65, "Listener entries preserve the full common song model.");
+            Check((await adapter.GetArtistInfoAsync("artist&音")).ImageUrl == "https://images.invalid/artist.jpg", "The phone reads the server's real large artist image through the shared protocol.");
+            externalArtistImage = false;
+            var localArtist = await adapter.GetArtistInfoAsync("artist&音");
+            Check(localArtist.ImageUrl == "https://images.invalid/local-artist.jpg" && localArtist.Biography == "Real biography", "Empty getArtistInfo artwork falls back to the actual OpenSubsonic artistImageUrl while retaining other metadata.");
+            await adapter.SetSongStarredAsync("song&音", true); await adapter.SetSongStarredAsync("song&音", false); await adapter.SetSongRatingAsync("song&音", 5);
+            Check(good.Requests.Where(request => request.Uri.AbsolutePath.EndsWith("star.view") || request.Uri.AbsolutePath.EndsWith("unstar.view") || request.Uri.AbsolutePath.EndsWith("setRating.view"))
+                .All(request => request.Method == "POST" && request.Parameter("id") == "song&音"), "Feedback uses real form POST star, unstar and rating requests for the escaped song ID.");
+            Check((await adapter.GetSongLyricsAsync("song&音", "Artist", "Track")).Single().Lines.Single().Text == "Structured line", "Advertised songLyrics capability selects structured song-ID lyrics.");
+            enhancedLyrics = false;
+            Check((await adapter.GetSongLyricsAsync("song&音", "Artist", "Track")).Single().Lines.Single().Text == "Legacy line", "An unsupported extension-discovery endpoint falls back to the legacy lyrics protocol.");
             var stream = new ProtocolRequest { Target = adapter.GetStreamUri("song&音").PathAndQuery, Headers = new Dictionary<string, string>() };
             Check(stream.Uri.AbsolutePath.EndsWith("stream.view") && stream.Parameter("id") == "song&音" && stream.Parameter("format") == "raw" && stream.Parameter("maxBitRate") == "192", "Phone stream requests escape IDs and apply explicit streaming settings.");
             Check(stream.Parameter("c") == SubsonicRequest.ClientName && stream.Parameter("v") == SubsonicRequest.ProtocolVersion && stream.Parameter("p") == service.Configuration.EncodedPassword, "Phone playback shares the PC client identity/protocol and encoded credential contract.");

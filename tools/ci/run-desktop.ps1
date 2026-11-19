@@ -22,7 +22,9 @@ $suites = @(
     'tools/phone/run-playback.ps1',
     'tools/phone/run-search.ps1',
     'tools/phone/run-library.ps1',
-    'tools/phone/run-listening.ps1'
+    'tools/phone/run-listening.ps1',
+    'tools/phone/run-collections.ps1',
+    'tools/phone/run-offline.ps1'
 )
 foreach ($suite in $suites) {
     Write-Host "Running $suite"

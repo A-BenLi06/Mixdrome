@@ -41,6 +41,9 @@ namespace Mixdrome.Phone.Views
             InitializeComponent();
             DataContext = this;
 
+            var sectionBar = FindName("SectionBar") as Mixdrome.Phone.Common.PhoneTitleBar;
+            if (sectionBar != null) sectionBar.Title = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToUpper(Mixdrome.Phone.Common.PhoneText.Get("UiMyMusic"));
+
             // Get control references after InitializeComponent
             _loadingIndicator = FindName("LoadingIndicator") as ProgressRing;
             _albumNameText = FindName("AlbumNameText") as TextBlock;

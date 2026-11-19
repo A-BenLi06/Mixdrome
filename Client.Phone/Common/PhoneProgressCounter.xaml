@@ -1,0 +1,10 @@
+<UserControl x:Class="Mixdrome.Phone.Common.PhoneProgressCounter"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    HorizontalAlignment="Right" VerticalAlignment="Bottom" IsHitTestVisible="False">
+    <Grid x:Name="Digits">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="SecondsColumn" /></Grid.ColumnDefinitions>
+        <TextBlock x:Name="MinutesText" FontFamily="{StaticResource PhoneReferenceBlackFontFamily}" FontWeight="Black" CharacterSpacing="0" Foreground="White" TextAlignment="Right" />
+        <TextBlock x:Name="SecondsText" Grid.Column="1" FontFamily="{StaticResource PhoneReferenceBlackFontFamily}" FontWeight="Black" CharacterSpacing="0" Foreground="White" TextAlignment="Left" />
+    </Grid>
+</UserControl>

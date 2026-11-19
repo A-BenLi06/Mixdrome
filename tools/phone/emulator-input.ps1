@@ -1,10 +1,11 @@
 param(
-    [Parameter(Mandatory = $true)][ValidateSet('Tap', 'Swipe', 'Key', 'Text', 'SkinButton')][string]$Action,
+    [Parameter(Mandatory = $true)][ValidateSet('Tap', 'Hold', 'Swipe', 'Key', 'Text', 'SkinButton')][string]$Action,
     [int]$X,
     [int]$Y,
     [int]$ToX,
     [int]$ToY,
     [ValidateRange(60, 500)][int]$DurationMilliseconds = 300,
+    [ValidateRange(600, 2000)][int]$HoldMilliseconds = 1000,
     [string]$ScreenshotPath,
     [string]$Key,
     [string]$TextFile,
@@ -19,7 +20,7 @@ $ErrorActionPreference = 'Stop'
 $phoneInputProjectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 $phoneInputArgument = ''
 switch ($Action) {
-    { $_ -eq 'Tap' -or $_ -eq 'Swipe' } {
+    { $_ -eq 'Tap' -or $_ -eq 'Hold' -or $_ -eq 'Swipe' } {
         if (-not $PSBoundParameters.ContainsKey('X') -or -not $PSBoundParameters.ContainsKey('Y') -or -not $ScreenshotPath) {
             throw "$Action requires -X, -Y and -ScreenshotPath from the observed guest display."
         }
@@ -33,6 +34,7 @@ switch ($Action) {
             throw "$Action coordinates must lie within the observed guest display."
         }
         $phoneInputArgument = "$X,$Y"
+        if ($Action -eq 'Hold') { $phoneInputArgument = "$X,$Y,$HoldMilliseconds" }
         if ($Action -eq 'Swipe') {
             if (-not $PSBoundParameters.ContainsKey('ToX') -or -not $PSBoundParameters.ContainsKey('ToY')) {
                 throw 'Swipe requires -ToX and -ToY within the observed guest display.'
@@ -175,6 +177,20 @@ internal static class EmulatorInput
                             }
                         }
                         finally { Contact(pipe, currentX, currentY, InputEventFlag.Up | InputEventFlag.Empty); }
+                        break;
+                    case "Hold":
+                        string[] holdCoordinates = args[2].Split(',');
+                        if (holdCoordinates.Length != 3) throw new ArgumentException("Expected hold coordinates and duration.");
+                        short holdX = short.Parse(holdCoordinates[0]);
+                        short holdY = short.Parse(holdCoordinates[1]);
+                        int holdMilliseconds = int.Parse(holdCoordinates[2]);
+                        if (holdMilliseconds < 600 || holdMilliseconds > 2000) throw new ArgumentException("Unsupported hold duration.");
+                        try
+                        {
+                            Contact(pipe, holdX, holdY, InputEventFlag.Down | InputEventFlag.InRange);
+                            Thread.Sleep(holdMilliseconds);
+                        }
+                        finally { Contact(pipe, holdX, holdY, InputEventFlag.Up | InputEventFlag.Empty); }
                         break;
                     case "Key":
                         string[] names = args[2].Split('+');

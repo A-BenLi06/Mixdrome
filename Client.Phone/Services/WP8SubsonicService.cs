@@ -5,6 +5,7 @@ namespace Mixdrome.Phone.Services
     using System.Linq;
     using System.Threading.Tasks;
     using Client.Common.Models.Subsonic;
+    using Client.Common.Models.Navidrome;
     using Client.Common.Services;
     using Client.Common.Services.DataStructures.SubsonicService;
     using Client.Common.Services.Navidrome;
@@ -52,6 +53,29 @@ namespace Mixdrome.Phone.Services
 
         public async Task<bool> PingAsync() { return await Api.Ping().ReadAsync(); }
         public Task<Song> GetSongAsync(string id) { return Api.GetSong(id).ReadAsync(); }
+        public async Task<ArtistInformation> GetArtistInfoAsync(string id)
+        {
+            var api = Api;
+            var information = await api.GetArtistInfo(id).ReadAsync();
+            if (string.IsNullOrWhiteSpace(information.ImageUrl))
+            {
+                var artist = await api.GetArtist(id).ReadAsync();
+                if (artist != null) information.ImageUrl = artist.ArtistImageUrl;
+            }
+            return information;
+        }
+        public Task<bool> SetSongStarredAsync(string id, bool value) { return Api.SetStarred(new Song { Id = id }, value).ReadAsync(); }
+        public Task<bool> SetSongRatingAsync(string id, int value) { return Api.SetRating(id, value).ReadAsync(); }
+        public async Task<IList<LyricVariant>> GetSongLyricsAsync(string id, string artist, string title)
+        {
+            var api = Api;
+            var extensions = api.GetExtensions();
+            await extensions.Execute();
+            IList<int> versions;
+            if (extensions.Error == null && extensions.Result.TryGetValue("songLyrics", out versions) && versions.Contains(1))
+                return await api.GetLyrics(id, true).ReadAsync();
+            return await api.GetLegacyLyrics(artist, title).ReadAsync();
+        }
         public Uri GetStreamUri(string songId)
         { RequireServer(); return new SubsonicService { Configuration = _configuration }.GetUriForFileWithId(songId); }
 

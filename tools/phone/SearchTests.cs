@@ -154,16 +154,22 @@ namespace Mixdrome.Phone
         };
     }
 }
+namespace Mixdrome.Phone.Common
+{
+    public sealed class PhoneTitleBar : Windows.UI.Xaml.Controls.Control { public string Title; }
+}
 namespace Mixdrome.Phone.Views
 {
     public sealed partial class SearchPage
     {
+        public readonly Mixdrome.Phone.Common.PhoneTitleBar TestSectionBar = new Mixdrome.Phone.Common.PhoneTitleBar();
         public readonly TextBlock TestEmpty = new TextBlock();
         public readonly ProgressRing TestProgress = new ProgressRing();
         public readonly Pivot TestPivot = new Pivot();
         public readonly AppBarButton TestMore = new AppBarButton();
         private void InitializeComponent()
         {
+            RegisterName("SectionBar", TestSectionBar);
             RegisterName("SearchTextBox", new TextBox()); RegisterName("EmptyStateText", TestEmpty);
             RegisterName("LoadingIndicator", TestProgress); RegisterName("ResultsPivot", TestPivot); RegisterName("MoreButton", TestMore);
         }

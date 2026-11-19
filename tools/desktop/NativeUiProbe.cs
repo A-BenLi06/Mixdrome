@@ -170,14 +170,15 @@ namespace Mixdrome.Diagnostics
                                 var before = indexedModel.Items.Count;
                                 var listBeforeIndex = (GridView)indexedView.FindName("LibraryItems");
                                 var pagingSelection = listBeforeIndex.Items.OfType<NavidromeItem>().LastOrDefault();
-                                if (pagingSelection != null && indexedModel.CanLoadMore)
+                                var pagingTested = pagingSelection != null && indexedModel.CanLoadMore;
+                                if (pagingTested)
                                 {
                                     listBeforeIndex.SelectedItems.Add(pagingSelection);
                                     listBeforeIndex.ScrollIntoView(pagingSelection, ScrollIntoViewAlignment.Leading);
                                     await indexedModel.LoadMore();
                                     pages.Add(await Capture(shell, folder, section + "-paged"));
                                 }
-                                var pagingPreserved = pagingSelection == null || indexedModel.SelectedItems.Contains(pagingSelection.SelectionItem);
+                                var pagingPreserved = !pagingTested || indexedModel.SelectedItems.Contains(pagingSelection.SelectionItem);
                                 listBeforeIndex.SelectedItems.Clear();
                                 if (listBeforeIndex.Items.Count > 0) listBeforeIndex.ScrollIntoView(listBeforeIndex.Items[0], ScrollIntoViewAlignment.Leading);
                                 listBeforeIndex.UpdateLayout();
@@ -186,6 +187,7 @@ namespace Mixdrome.Diagnostics
                                 var target = indexedModel.IndexGroups.LastOrDefault(group => group.IsEnabled);
                                 var check = new JsonObject();
                                 check["section"] = JsonValue.CreateStringValue(section);
+                                check["pagingTested"] = JsonValue.CreateBooleanValue(pagingTested);
                                 check["pagingSelectionPreserved"] = JsonValue.CreateBooleanValue(pagingPreserved);
                                 check["beforeCount"] = JsonValue.CreateNumberValue(before);
                                 check["afterCount"] = JsonValue.CreateNumberValue(indexedModel.Items.Count);

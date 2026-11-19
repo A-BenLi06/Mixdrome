@@ -31,11 +31,11 @@ def template(filename, key, output_key, bindings=None, reference=REFERENCE):
 def wordmark(reference):
     return '''    <!-- Mixdrome wordmark: the product name resolves through PRI resources. -->
     <ControlTemplate x:Key="MixdromeWordmarkTemplate">
-        <Viewbox Stretch="Uniform" HorizontalAlignment="Left">
-            <TextBlock FontFamily="Segoe UI" FontSize="52" Foreground="White" FlowDirection="LeftToRight">
+        <Grid Height="41" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <TextBlock FontFamily="Segoe UI" FontSize="68" Margin="-3,-33,0,-16" Foreground="White" FlowDirection="LeftToRight">
                 <Run x:Uid="BrandPrefix" FontWeight="Bold" /><Run x:Uid="BrandSuffix" FontWeight="Light" />
             </TextBlock>
-        </Viewbox>
+        </Grid>
     </ControlTemplate>
 '''
 

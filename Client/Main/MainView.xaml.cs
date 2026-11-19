@@ -25,8 +25,9 @@ namespace Mixdrome.Main
             var narrow = ActualWidth < 800;
             MainHub.Orientation = narrow ? Orientation.Vertical : Orientation.Horizontal;
             HeaderIndent.Width = new GridLength(narrow ? 0 : 80);
-            WordmarkHost.Width = narrow ? 220 : 266;
-            WordmarkHost.Height = 41 * WordmarkHost.Width / 266;
+            WordmarkHost.Height = narrow ? 34 : 41;
+            WordmarkHost.MaxWidth = narrow ? Math.Max(160, ActualWidth - 132) : 360;
+            WordmarkHost.Margin = new Thickness(0, 0, narrow ? 18 : 24, 0);
             SearchControl.Margin = new Thickness(0, narrow ? 112 : 70, narrow ? 20 : 32, 0);
             SearchControl.Width = Math.Min(270, Math.Max(220, ActualWidth - 40));
             ConnectionStatus.Width = Math.Min(320, Math.Max(220, ActualWidth - 40));

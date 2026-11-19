@@ -213,6 +213,10 @@ instances are running, supply the same explicit `-VirtualMachineName` to both
 tools. Run them serially because each tool compiles its SDK adapter to a shared
 ignored output directory. Convert captures to WebP before presenting them.
 
+`Hold -X <x> -Y <y> -ScreenshotPath <guest.png>` keeps an SDK touch contact down
+for `-HoldMilliseconds` (600–2000 ms, default 1000), then releases it. It uses
+the same screenshot coordinate checks as `Tap` and exercises the guest's actual
+long-press recognition. `-CompileOnly` builds the input adapter without sending input.
 `Swipe` accepts start/end coordinates and a duration; `SkinButton -SkinButton
 Back` exercises the guest's hardware Back. `Key` sends a guest key/chord and
 `Text -TextFile <private-utf8-file>` keeps input text out of process arguments.

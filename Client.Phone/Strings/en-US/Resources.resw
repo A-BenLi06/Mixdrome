@@ -217,4 +217,63 @@
 <data name="Phone_Text_PlayLibraryItem" xml:space="preserve"><value>Play {0}</value></data>
 <data name="Phone_Text_OpenLibraryItem" xml:space="preserve"><value>Open {0}</value></data>
 <data name="PhoneUi_Text_ShuffleAll.Text" xml:space="preserve"><value>shuffle all</value></data>
+<data name="PhoneUi_Brand_Lead.Text" xml:space="preserve"><value>Mix</value></data>
+<data name="PhoneUi_Brand_Tail.Text" xml:space="preserve"><value>drome</value></data>
+<data name="Phone_Text_UiHome" xml:space="preserve"><value>home</value></data>
+<data name="Phone_Text_UiCreateMix" xml:space="preserve"><value>create a mix</value></data>
+<data name="Phone_Text_UiOfflineMixes" xml:space="preserve"><value>offline mixes</value></data>
+<data name="PhoneUi_Text_CreateMix.Text" xml:space="preserve"><value>create a mix</value></data>
+<data name="PhoneUi_Text_OfflineMixes.Text" xml:space="preserve"><value>offline mixes</value></data>
+<data name="PhoneUi_Label_Settings.Label" xml:space="preserve"><value>settings</value></data>
+<data name="PhoneUi_Label_Help.Label" xml:space="preserve"><value>help</value></data>
+<data name="Phone_Text_AboutMessage" xml:space="preserve"><value>Connect to your Navidrome or Subsonic server to listen to your music, build mixes, and save them for offline listening.</value></data>
+<data name="Phone_Text_PlayMeTitle" xml:space="preserve"><value>PLAY ME</value></data>
+<data name="Phone_Text_LikeSong" xml:space="preserve"><value>like this song</value></data>
+<data name="Phone_Text_DislikeSong" xml:space="preserve"><value>dislike this song</value></data>
+<data name="Phone_Text_FavouriteSong" xml:space="preserve"><value>favourite song</value></data>
+<data name="Phone_Text_LikedSongTitle" xml:space="preserve"><value>Great song!</value></data>
+<data name="Phone_Text_LikedSongMessage" xml:space="preserve"><value>Rated 5 out of 5 on your server.</value></data>
+<data name="Phone_Text_DislikedSongTitle" xml:space="preserve"><value>Song skipped</value></data>
+<data name="Phone_Text_DislikedSongMessage" xml:space="preserve"><value>Rated 1 out of 5 on your server.</value></data>
+<data name="Phone_Text_FeedbackFailed" xml:space="preserve"><value>Your feedback could not be saved. Try again.</value></data>
+<data name="Phone_Text_UiOk" xml:space="preserve"><value>ok</value></data>
+<data name="Phone_Text_ShareSong" xml:space="preserve"><value>share song</value></data>
+<data name="Phone_Text_Lyrics" xml:space="preserve"><value>lyrics</value></data>
+<data name="Phone_Text_NoLyrics" xml:space="preserve"><value>No lyrics are available for this song.</value></data>
+<data name="Phone_Text_LyricsFailed" xml:space="preserve"><value>Lyrics could not be loaded. Try again.</value></data>
+<data name="Phone_Text_UiWhatsNew" xml:space="preserve"><value>what’s new</value></data>
+<data name="Phone_Text_UiFeatured" xml:space="preserve"><value>featured</value></data>
+<data name="Phone_Text_UiCategories" xml:space="preserve"><value>categories</value></data>
+<data name="Phone_Text_FavouriteUpdatesEmpty" xml:space="preserve"><value>New library albums by your favourite artists appear here.</value></data>
+<data name="PhoneUi_Label_AddArtist.Label" xml:space="preserve"><value>add artist</value></data>
+<data name="PhoneUi_Label_SelectArtists.Label" xml:space="preserve"><value>select</value></data>
+<data name="Phone_Text_AddArtist" xml:space="preserve"><value>add artist</value></data>
+<data name="Phone_Text_Add" xml:space="preserve"><value>add</value></data>
+<data name="Phone_Text_Cancel" xml:space="preserve"><value>cancel</value></data>
+<data name="Phone_Text_NoArtistsToAdd" xml:space="preserve"><value>All library artists are already favourites.</value></data>
+<data name="PhoneUi_Label_RemoveFavourites.Label" xml:space="preserve"><value>remove</value></data>
+<data name="PhoneUi_Label_Done.Label" xml:space="preserve"><value>done</value></data>
+<data name="Phone_Text_CreateMixTitle" xml:space="preserve"><value>create a mix</value></data>
+<data name="Phone_Text_MixName" xml:space="preserve"><value>mix name</value></data>
+<data name="Phone_Text_CreateMixDescription" xml:space="preserve"><value>Choose a genre to create a mix from your library and save it as a playlist.</value></data>
+<data name="Phone_Text_CreateMixAction" xml:space="preserve"><value>create and play</value></data>
+<data name="Phone_Text_AllGenres" xml:space="preserve"><value>all genres</value></data>
+<data name="Phone_Text_MixNameRequired" xml:space="preserve"><value>Enter a name for this mix.</value></data>
+<data name="Phone_Text_MixCreated" xml:space="preserve"><value>Saved {0} with {1} songs.</value></data>
+<data name="Phone_Text_OfflineMixesTitle" xml:space="preserve"><value>offline mixes</value></data>
+<data name="Phone_Text_OfflineMixesHint" xml:space="preserve"><value>Press and hold a mix in mixes to save it offline.</value></data>
+<data name="Phone_Text_OfflineDownloadingHint" xml:space="preserve"><value>Keep this page open while your mix is downloading.</value></data>
+<data name="Phone_Text_CancelDownload" xml:space="preserve"><value>cancel download</value></data>
+<data name="Phone_Text_NoOfflineMixes" xml:space="preserve"><value>No mixes saved for offline listening yet.</value></data>
+<data name="Phone_Text_OfflineDownloadComplete" xml:space="preserve"><value>Available offline.</value></data>
+<data name="Phone_Text_OfflineDownloadCancelled" xml:space="preserve"><value>Download cancelled.</value></data>
+<data name="Phone_Text_OfflineDownloadFailed" xml:space="preserve"><value>Download failed: {0}</value></data>
+<data name="Phone_Text_OfflineDownloadProgress" xml:space="preserve"><value>Downloading… {0}/{1}</value></data>
+<data name="Phone_Text_OfflineDataInvalid" xml:space="preserve"><value>The saved mix data is invalid.</value></data>
+<data name="Phone_Text_OfflineFileMissing" xml:space="preserve"><value>This mix has missing or changed files. Download it again.</value></data>
+<data name="Phone_Text_DownloadingUnavailable" xml:space="preserve"><value>This account cannot download music.</value></data>
+<data name="Phone_Text_OfflineAudioOnly" xml:space="preserve"><value>Only audio tracks can be saved in an offline mix.</value></data>
+<data name="Phone_Text_OfflineAccountChanged" xml:space="preserve"><value>The account or server changed. Open the page again to continue.</value></data>
+<data name="Phone_Text_RemoveOfflineMix" xml:space="preserve"><value>remove offline mix</value></data>
+<data name="Phone_Text_SaveOfflineMix" xml:space="preserve"><value>make available offline</value></data>
 </root>

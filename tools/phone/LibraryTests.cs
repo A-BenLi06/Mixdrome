@@ -303,10 +303,15 @@ namespace Windows.Phone.UI.Input
     public sealed class BackPressedEventArgs : EventArgs { public bool Handled; }
     public static class HardwareButtons { public static event EventHandler<BackPressedEventArgs> BackPressed { add { } remove { } } }
 }
+namespace Mixdrome.Phone.Common
+{
+    public sealed class PhoneTitleBar : Windows.UI.Xaml.Controls.Control { public string Title; }
+}
 namespace Mixdrome.Phone.Views
 {
     public sealed partial class LibraryPage
     {
+        private readonly Mixdrome.Phone.Common.PhoneTitleBar SectionBar = new Mixdrome.Phone.Common.PhoneTitleBar();
         private readonly Pivot LibraryPivot = new Pivot();
         private readonly TextBlock StatusText = new TextBlock();
         private readonly ProgressRing LoadingIndicator = new ProgressRing();

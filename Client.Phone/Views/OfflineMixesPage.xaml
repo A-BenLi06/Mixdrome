@@ -1,0 +1,45 @@
+<Page x:Class="Mixdrome.Phone.Views.OfflineMixesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:common="using:Mixdrome.Phone.Common" Background="Black">
+    <Page.Resources>
+        <DataTemplate x:Key="OfflineCardTemplate">
+            <StackPanel Width="{Binding Size}" Margin="{Binding Spacing}">
+                <Grid Height="{Binding Size}" Background="{ThemeResource PhoneAccentBrush}">
+                    <Image Source="{Binding Artwork}" Stretch="UniformToFill" ImageFailed="OnArtworkFailed" />
+                    <Rectangle Fill="{StaticResource MixRadioPlayMeBrush}" Visibility="{Binding PlayMeVisibility}" />
+                    <Image Source="/Assets/MixRadio/PlayMeTileIcon.png" Stretch="Uniform" Visibility="{Binding PlayMeVisibility}" />
+                    <Grid VerticalAlignment="Bottom" Height="{Binding CaptionHeight}">
+                        <Border Background="{ThemeResource PhoneAccentBrush}" Opacity="0.6" Visibility="{Binding LabelVisibility}" />
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="{Binding LabelMargin}" FontFamily="{StaticResource PhoneReferenceSemiBoldFontFamily}" FontSize="{Binding CaptionSize}" FontWeight="SemiBold" CharacterSpacing="0" LineHeight="{Binding CaptionLineHeight}" LineStackingStrategy="BlockLineHeight" MaxHeight="{Binding CaptionMaxHeight}" Foreground="White" TextWrapping="Wrap" TextTrimming="WordEllipsis" />
+                    </Grid>
+                </Grid>
+                <ProgressBar Value="{Binding Progress}" Maximum="100" Height="{Binding ProgressBarHeight}" IsIndeterminate="{Binding IsIndeterminate}" Foreground="{ThemeResource PhoneAccentBrush}" Background="#FF222222" Visibility="{Binding ProgressVisibility}" Margin="0,4,0,0" />
+                <TextBlock Text="{Binding Status}" FontSize="{Binding StatusFontSize}" Foreground="#FF888888" TextWrapping="Wrap" Visibility="{Binding ProgressVisibility}" />
+            </StackPanel>
+        </DataTemplate>
+        <ItemsPanelTemplate x:Key="OfflineItemsPanel"><ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="2" Loaded="OnPanelLoaded" SizeChanged="OnPanelSizeChanged" /></ItemsPanelTemplate>
+        <Style x:Key="OfflineContainerStyle" TargetType="GridViewItem">
+            <Setter Property="VerticalContentAlignment" Value="Top" /><Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Padding" Value="0" /><Setter Property="Margin" Value="0" /><Setter Property="MinWidth" Value="0" /><Setter Property="MinHeight" Value="0" /><Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+    </Page.Resources>
+    <Page.BottomAppBar>
+        <CommandBar Background="{StaticResource MixRadioCommandBarBrush}" ClosedDisplayMode="Minimal">
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Name="CancelButton" Click="OnCancelClick" Visibility="Collapsed" />
+                <AppBarButton x:Uid="PhoneUi_Label_Refresh" Click="OnRefreshClick" />
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
+    <Grid x:Name="LayoutRoot" SizeChanged="OnRootSizeChanged">
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+        <common:PhoneTitleBar x:Name="PageTitleBar" />
+        <StackPanel x:Name="HeadingPanel" Grid.Row="1" Margin="24,5,24,12">
+            <TextBlock x:Name="PageTitle" FontFamily="{StaticResource PhoneReferenceSemiLightFontFamily}" FontSize="72" FontWeight="SemiLight" CharacterSpacing="0" Foreground="White" Margin="-3,0,0,16" />
+            <TextBlock x:Name="HintText" FontSize="21" Foreground="White" TextWrapping="Wrap" LineStackingStrategy="BlockLineHeight" LineHeight="26" MinHeight="52" />
+        </StackPanel>
+        <GridView x:Name="MixGrid" Grid.Row="2" ItemsSource="{Binding Cards}" Margin="24,0,6,0" Padding="0" BorderThickness="0" ItemsPanel="{StaticResource OfflineItemsPanel}" ItemTemplate="{StaticResource OfflineCardTemplate}" ItemContainerStyle="{StaticResource OfflineContainerStyle}" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnMixClick" Holding="OnMixHolding" SizeChanged="OnGridSizeChanged" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled" />
+        <TextBlock x:Name="StatusText" Grid.Row="3" FontSize="20" Foreground="White" TextWrapping="Wrap" Margin="24,0,24,8" Visibility="Collapsed" />
+    </Grid>
+</Page>

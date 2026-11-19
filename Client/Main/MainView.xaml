@@ -3,6 +3,7 @@
     xmlns:framework="using:Mixdrome.Framework" xmlns:common="using:Mixdrome.Common" xmlns:nav="using:Mixdrome.Navidrome" KeyDown="OnPageKeyDown">
     <Page.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Navidrome/NavidromeResources.xaml" />
+        <ResourceDictionary Source="/Navidrome/MixRadioOverlayResources.xaml" />
     </ResourceDictionary.MergedDictionaries>
         <DataTemplate x:Key="SectionHeading"><TextBlock Text="{Binding}" Style="{StaticResource MediumLightText}" Margin="2,-5,0,-10" /></DataTemplate>
     </ResourceDictionary></Page.Resources>
@@ -18,8 +19,8 @@
             <Hub.Header><Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition x:Name="HeaderIndent" Width="80" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Viewbox x:Name="WordmarkHost" Width="266" Height="41" VerticalAlignment="Top">
-                        <ContentControl Template="{StaticResource MixdromeWordmarkTemplate}" />
+                    <Viewbox x:Name="WordmarkHost" Height="41" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,24,0">
+                        <ContentControl Template="{StaticResource MixdromeWordmarkTemplate}" HorizontalContentAlignment="Left" />
                     </Viewbox>
                     <Button x:Uid="Navidrome_LibraryButton" Content="&#xE14C;" Style="{StaticResource ButtonBase}" VerticalAlignment="Bottom" Margin="0,0,0,2" Click="OnLibraryClicked" />
                 </StackPanel>
@@ -55,8 +56,8 @@
                 <Button x:Uid="Navidrome_ConnectionSettings" Style="{StaticResource NullButtonStyleWithPress}" Foreground="{StaticResource NokiaPinkBrush}" Margin="0,16,0,0" Click="OnSettingsClicked" />
             </StackPanel>
         </Border>
-        <Button x:Name="QueueDismiss" Style="{StaticResource NullButtonStyle}" Background="Transparent" Visibility="Collapsed"
-            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsTabStop="False" Click="OnQueueDismissed" />
-        <nav:MixRadioQueuePanel x:Name="QueueDrawer" DataContext="{Binding Player}" HorizontalAlignment="Right" Visibility="Collapsed" CloseRequested="OnQueueClosed" />
+        <Button x:Name="QueueDismiss" Style="{StaticResource MixRadioDismissButtonStyle}" Background="Black" Opacity="0.5" Visibility="Collapsed"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="OnQueueDismissed" />
+        <nav:MixRadioQueuePanel x:Name="QueueDrawer" DataContext="{Binding Player}" HorizontalAlignment="Left" Visibility="Collapsed" CloseRequested="OnQueueClosed" />
     </Grid>
 </framework:AppPage>

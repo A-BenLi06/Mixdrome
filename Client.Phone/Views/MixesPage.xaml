@@ -1,0 +1,37 @@
+<Page x:Class="Mixdrome.Phone.Views.MixesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:common="using:Mixdrome.Phone.Common"
+      Background="Black" SizeChanged="OnPageSizeChanged">
+    <Page.Resources>
+        <Thickness x:Key="PivotHeaderItemMargin">0,-6.5,0,0</Thickness>
+        <DataTemplate x:Key="MixHeadingTemplate"><TextBlock Text="{Binding Name}" FontSize="{Binding Size}" FontFamily="{StaticResource PhoneReferenceSemiLightFontFamily}" FontWeight="SemiLight" CharacterSpacing="0" Margin="{Binding Margin}" /></DataTemplate>
+        <DataTemplate x:Key="MixCardTemplate">
+            <Grid Width="{Binding Size}" Height="{Binding Size}" Margin="{Binding CardMargin}" Background="{ThemeResource PhoneAccentBrush}" Holding="OnCardHolding">
+                <Image Source="{Binding Artwork}" Stretch="UniformToFill" ImageFailed="OnArtworkFailed" />
+                <Grid VerticalAlignment="Bottom" Height="{Binding LabelHeight}">
+                    <Border Background="{ThemeResource PhoneAccentBrush}" Opacity="0.6" />
+                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="{Binding LabelMargin}" FontFamily="{StaticResource PhoneReferenceSemiBoldFontFamily}" FontSize="{Binding LabelSize}" FontWeight="SemiBold" CharacterSpacing="0" LineHeight="{Binding LabelLineHeight}" LineStackingStrategy="BlockLineHeight" MaxHeight="{Binding LabelMaxHeight}" Foreground="White" TextWrapping="Wrap" TextTrimming="WordEllipsis" />
+                </Grid>
+            </Grid>
+        </DataTemplate>
+        <ItemsPanelTemplate x:Key="MixItemsPanel"><ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="2" Loaded="OnPanelLoaded" SizeChanged="OnPanelSizeChanged" /></ItemsPanelTemplate>
+        <Style x:Key="MixCardContainerStyle" TargetType="GridViewItem">
+            <Setter Property="Padding" Value="0" /><Setter Property="Margin" Value="0" /><Setter Property="MinWidth" Value="0" /><Setter Property="MinHeight" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Stretch" />
+        </Style>
+    </Page.Resources>
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+        <common:PhoneTitleBar x:Name="SectionBar" />
+        <Pivot x:Name="MixesPivot" Grid.Row="1" HeaderTemplate="{StaticResource MixHeadingTemplate}" SelectionChanged="OnTabChanged">
+            <PivotItem x:Name="FeaturedTab" Tag="featured" Margin="0">
+                <GridView x:Name="FeaturedGrid" ItemsSource="{Binding Featured}" Margin="12,0,0,0" Padding="0" BorderThickness="0" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnItemClick" Loaded="OnGridLoaded" SizeChanged="OnGridSizeChanged" ItemsPanel="{StaticResource MixItemsPanel}" ItemTemplate="{StaticResource MixCardTemplate}" ItemContainerStyle="{StaticResource MixCardContainerStyle}" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled" />
+            </PivotItem>
+            <PivotItem x:Name="CategoriesTab" Tag="categories" Margin="0">
+                <GridView x:Name="CategoriesGrid" ItemsSource="{Binding Categories}" Margin="12,0,0,0" Padding="0" BorderThickness="0" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnItemClick" Loaded="OnGridLoaded" SizeChanged="OnGridSizeChanged" ItemsPanel="{StaticResource MixItemsPanel}" ItemTemplate="{StaticResource MixCardTemplate}" ItemContainerStyle="{StaticResource MixCardContainerStyle}" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled" />
+            </PivotItem>
+        </Pivot>
+        <StackPanel x:Name="StatusPanel" Grid.Row="2" Margin="24,0,24,8" Visibility="Collapsed"><TextBlock x:Name="StatusText" Style="{StaticResource BodyTextStyle}" TextWrapping="Wrap" /><ProgressRing x:Name="LoadingIndicator" Width="32" Height="32" /></StackPanel>
+    </Grid>
+</Page>

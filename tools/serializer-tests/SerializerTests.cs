@@ -73,11 +73,30 @@ public static class SerializerTests
         AlbumHandleResponse();
         MusicDirectoryHandleResponse();
         SongHandleResponse();
+        DeserializeArtistImage();
         PlaylistXmlRoundTrip();
 
         Console.WriteLine(_failures == 0 ? "ALL TESTS PASSED (" + modelTypes.Count + " model types)"
                                          : _failures + " FAILURES");
         Environment.Exit(_failures == 0 ? 0 : 1);
+    }
+
+    private static void DeserializeArtistImage()
+    {
+        var serializer = new XmlSerializer(typeof(Client.Common.Models.Subsonic.ExpandedArtist));
+        const string image = "https://images.example.invalid/artist.jpg?size=600&token=opaque";
+        var xml = "<artist xmlns='http://subsonic.org/restapi' id='artist&amp;音' name='艺人' albumCount='2' coverArt='ar-opaque:1' artistImageUrl='https://images.example.invalid/artist.jpg?size=600&amp;token=opaque'><album id='a' name='Album'/></artist>";
+        using (var reader = new StringReader(xml))
+        {
+            var artist = (Client.Common.Models.Subsonic.ExpandedArtist)serializer.Deserialize(reader);
+            if (artist.Id != "artist&音" || artist.ArtistImageUrl != image || artist.CoverArt != "ar-opaque:1" || artist.Albums.Count != 1)
+            {
+                _failures++;
+                Console.WriteLine("FAIL ExpandedArtist artistImageUrl protocol metadata");
+                return;
+            }
+        }
+        Console.WriteLine("PASS ExpandedArtist artistImageUrl: real image URL, escaping, opaque cover ID and album metadata");
     }
 
     private static void PlaylistXmlRoundTrip()

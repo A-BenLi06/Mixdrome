@@ -301,6 +301,8 @@ for path in sorted(phone_included | background_included):
                     issues.append(f'{label(path)}: {uid}.{property_name} cannot target {tag}')
         if re.search(r'\{x:Bind\b|\bxmlns[^=]*="using:Microsoft\.UI\.', source):
             issues.append(f'{label(path)}: Windows 10/WinUI XAML binding or namespace')
+        if re.search(r'Segoe WP (?:Light|SemiLight|Semibold|SemiBold|Bold|Black)\b', source):
+            issues.append(f'{label(path)}: DirectWrite Segoe WP weights must use FontFamily="Segoe WP" with FontWeight')
     else:
         if re.search(r'\busing\s+(?:Microsoft\.UI|Windows\.UI\.Composition)\b|\bApiInformation\s*\.|\bMediaPlaybackList\b', source):
             issues.append(f'{label(path)}: Windows 10/WinUI API is unavailable on WP8.1')

@@ -7,93 +7,166 @@ namespace Mixdrome.Phone.Views
     using Client.Common.Models.Navidrome;
     using Client.Common.Models.Subsonic;
     using Client.Common.Services.Navidrome;
+    using Client.Common.Services;
     using Mixdrome.Phone.Common;
     using Mixdrome.Phone.Services;
+    using Windows.UI.Popups;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
+    using Windows.UI.Xaml.Media.Imaging;
     using Windows.UI.Xaml.Navigation;
     public sealed partial class MainPage : Page
     {
-        private PhoneHomePanel home;
-        private IList<Album> history = new List<Album>();
         private int generation;
         private bool active;
         private bool startingPlayback;
-        public MainPage() { InitializeComponent(); SizeChanged += OnSizeChanged; }
-        protected override async void OnNavigatedTo(NavigationEventArgs e) { base.OnNavigatedTo(e); active = true; ResizeSections(); await LoadHome(); }
-        protected override void OnNavigatedFrom(NavigationEventArgs e) { active = false; generation++; base.OnNavigatedFrom(e); }
+        private PhonePlaybackObserver observer;
+        private string homeAccount;
+        public MainPage() { InitializeComponent(); NavigationCacheMode = NavigationCacheMode.Enabled; SizeChanged += OnSizeChanged; }
+        protected override async void OnNavigatedTo(NavigationEventArgs args)
+        {
+            base.OnNavigatedTo(args); active = true; ResizeSections();
+            var navigation = ++generation;
+            if (!IsCurrent(navigation)) return;
+            var nextObserver = new PhonePlaybackObserver(Dispatcher);
+            observer = nextObserver; nextObserver.Changed += OnPlaybackChanged;
+            await nextObserver.StartAsync();
+            if (!IsCurrent(navigation) || !ReferenceEquals(observer, nextObserver)) { nextObserver.Dispose(); return; }
+            await LoadHome();
+        }
+        protected override void OnNavigatedFrom(NavigationEventArgs args)
+        {
+            active = false; generation++;
+            if (observer != null) { observer.Dispose(); observer = null; }
+            base.OnNavigatedFrom(args);
+        }
+        private void OnPlaybackChanged(object sender, EventArgs args)
+        {
+            if (active && observer != null && ReferenceEquals(sender, observer)) HomeTiles.SetCurrent(observer.Track, observer.Position);
+        }
         private bool IsCurrent(int version) { return active && generation == version; }
+        private void UpdateStatusBanner()
+        {
+            StatusBanner.Visibility = !string.IsNullOrEmpty(StatusText.Text) || LoadingIndicator.Visibility == Visibility.Visible
+                ? Visibility.Visible : Visibility.Collapsed;
+        }
         private async Task LoadHome()
         {
             var version = ++generation;
-            LoadingIndicator.IsActive = true; LoadingIndicator.Visibility = Visibility.Visible;
-            StatusText.Text = string.Empty;
-            history = new List<Album>(); if (home != null) home.SetHistory(history);
+            LoadingIndicator.IsActive = true; LoadingIndicator.Visibility = Visibility.Visible; StatusText.Text = string.Empty; UpdateStatusBanner();
             try
             {
+                var account = AccountIdentity.For(PhoneSettings.Load());
+                if (homeAccount != account)
+                {
+                    homeAccount = account;
+                    ArtistBackdrop.Source = null;
+                    HomeTiles.SetHistory(new List<Album>());
+                    HomeTiles.SetMixes(new List<Playlist>());
+                }
                 var service = await PhoneSubsonicServiceFactory.CreateAsync();
                 if (!IsCurrent(version)) return;
-                if (string.IsNullOrEmpty(service.Configuration.BaseUrl)) { StatusText.Text = PhoneText.Get("ConfigureServer"); return; }
-                var albums = await new NavidromeApi(service.Configuration).GetAlbums(new AlbumQuery { Type = AlbumListType.Recent, Size = 3 }).ReadAsync();
+                if (string.IsNullOrEmpty(service.Configuration.BaseUrl)) { StatusText.Text = PhoneText.Get("ConfigureServer"); UpdateStatusBanner(); return; }
+                var api = new NavidromeApi(service.Configuration);
+                var albums = await api.GetAlbums(new AlbumQuery { Type = AlbumListType.Recent, Size = 3 }).ReadAsync();
                 if (!IsCurrent(version)) return;
                 foreach (var album in albums) album.CoverArt = service.GetCoverArtForId(album.CoverArt);
-                history = albums; if (home != null) home.SetHistory(history);
-                StatusText.Text = albums.Count == 0 ? PhoneText.Get("NoRecentAlbums") : string.Empty;
+                HomeTiles.SetHistory(albums);
+                var mixes = (await api.GetPlaylists().ReadAsync()).OrderByDescending(p => p.Changed).ThenByDescending(p => p.Created).Take(2).ToList();
+                if (!IsCurrent(version)) return;
+                foreach (var mix in mixes) mix.CoverArt = service.GetCoverArtForId(mix.CoverArt);
+                HomeTiles.SetMixes(mixes);
+                // Artist photos are supplied by the account's server, never
+                // inferred from album artwork or a packaged stock portrait.
+                var starred = await api.GetStarred(null).ReadAsync();
+                var artistService = new WP8SubsonicService();
+                artistService.Configure((Client.Common.Services.DataStructures.SubsonicService.SubsonicServiceConfiguration)service.Configuration);
+                var artistIds = starred.Artists.Select(a => a.Id).Concat(albums.Select(a => a.ArtistId)).Where(id => !string.IsNullOrEmpty(id)).Distinct().Take(5);
+                foreach (var id in artistIds)
+                {
+                    var info = await artistService.GetArtistInfoAsync(id);
+                    if (!IsCurrent(version)) return;
+                    Uri photo;
+                    if (Uri.TryCreate(info.ImageUrl, UriKind.Absolute, out photo) && (photo.Scheme == "http" || photo.Scheme == "https"))
+                    { ArtistBackdrop.Source = new BitmapImage(photo); break; }
+                }
             }
-            catch (Exception ex) { if (IsCurrent(version)) StatusText.Text = PhoneText.Format("LoadFailed", ex.Message); }
-            finally { if (IsCurrent(version)) { LoadingIndicator.IsActive = false; LoadingIndicator.Visibility = Visibility.Collapsed; } }
+            catch (Exception ex) { if (IsCurrent(version)) { StatusText.Text = PhoneText.Format("LoadFailed", ex.Message); UpdateStatusBanner(); } }
+            finally { if (IsCurrent(version)) { LoadingIndicator.IsActive = false; LoadingIndicator.Visibility = Visibility.Collapsed; UpdateStatusBanner(); } }
         }
-        private void OnHomePanelLoaded(object sender, RoutedEventArgs e)
+        private async void OnTileClicked(object sender, PhoneTileEventArgs args)
         {
-            var panel = (PhoneHomePanel)sender;
-            panel.TileClicked -= OnTileClicked; panel.TileClicked += OnTileClicked;
-            home = panel; panel.SetHistory(history); panel.IsBusy = startingPlayback;
-        }
-        private async void OnTileClicked(object sender, PhoneTileEventArgs e)
-        {
-            if (e.Route == "playme") { await PlayMe(); return; }
-            if (e.Route == "album" && e.Album != null) { Frame.Navigate(typeof(AlbumPage), e.Album.Id); return; }
-            Navigate(e.Route);
+            if (args.Route == "playme") { await PlayMe(); return; }
+            if (args.Route == "album" && args.Album != null) { Frame.Navigate(typeof(AlbumPage), args.Album.Id); return; }
+            if (args.Route == "playlist" && args.Playlist != null) { Frame.Navigate(typeof(MixesPage), args.Playlist.Id); return; }
+            Navigate(args.Route);
         }
         private async Task PlayMe()
         {
             if (startingPlayback) return;
-            var version = generation; startingPlayback = true; if (home != null) home.IsBusy = true;
+            var version = generation; startingPlayback = true; HomeTiles.IsBusy = true;
             try
             {
                 var service = await PhoneSubsonicServiceFactory.CreateAsync();
                 if (!IsCurrent(version)) return;
-                if (string.IsNullOrEmpty(service.Configuration.BaseUrl)) { StatusText.Text = PhoneText.Get("ConfigureServer"); return; }
+                if (string.IsNullOrEmpty(service.Configuration.BaseUrl)) { StatusText.Text = PhoneText.Get("ConfigureServer"); UpdateStatusBanner(); return; }
                 var songs = await new NavidromeApi(service.Configuration).GetRandomSongs(new RandomSongQuery { Size = 30 }).ReadAsync();
                 if (!IsCurrent(version)) return;
-                if (songs.Count == 0) { StatusText.Text = PhoneText.Get("NoSongs"); return; }
-                Frame.Navigate(typeof(PlaybackPage), new PlaybackNavigationParameter { Playlist = songs.Select((song, index) => new SongDisplayItem { Id = song.Id, Track = index + 1, Title = song.Title ?? song.Name, Artist = song.Artist, Album = song.Album, CoverArt = song.CoverArt, Duration = song.Duration }).ToList(), StartIndex = 0 });
+                if (songs.Count == 0) { StatusText.Text = PhoneText.Get("NoSongs"); UpdateStatusBanner(); return; }
+                Frame.Navigate(typeof(PlaybackPage), new PlaybackNavigationParameter { IsMix = true, Playlist = songs.Select((song, index) => new SongDisplayItem { Id = song.Id, Track = index + 1, Title = song.Title ?? song.Name, Artist = song.Artist, Album = song.Album, CoverArt = song.CoverArt, Duration = song.Duration }).ToList(), StartIndex = 0 });
             }
-            catch (Exception ex) { if (IsCurrent(version)) StatusText.Text = PhoneText.Format("LoadFailed", ex.Message); }
-            finally { startingPlayback = false; if (home != null) home.IsBusy = false; }
+            catch (Exception ex) { if (IsCurrent(version)) { StatusText.Text = PhoneText.Format("LoadFailed", ex.Message); UpdateStatusBanner(); } }
+            finally { startingPlayback = false; HomeTiles.IsBusy = false; }
         }
         private void Navigate(string route)
         {
             switch (route)
             {
-                case "library": case "artists": Frame.Navigate(typeof(LibraryPage), "artists"); break;
-                case "albums": Frame.Navigate(typeof(LibraryPage), "albums"); break;
+                case "library": Frame.Navigate(typeof(LibraryPage), "artists"); break;
                 case "recent": Frame.Navigate(typeof(LibraryPage), "recent"); break;
-                case "genres": Frame.Navigate(typeof(LibraryPage), "genres"); break;
-                case "playlists": Frame.Navigate(typeof(LibraryPage), "playlists"); break;
+                case "mixes": Frame.Navigate(typeof(MixesPage)); break;
+                case "create": Frame.Navigate(typeof(CreateMixPage)); break;
+                case "offline": Frame.Navigate(typeof(OfflineMixesPage)); break;
                 case "favourites": Frame.Navigate(typeof(FavouritesPage)); break;
-                case "radio": Frame.Navigate(typeof(RadioStationsPage)); break;
-                case "activity": Frame.Navigate(typeof(NowPlayingPage)); break;
                 case "player": Frame.Navigate(typeof(PlaybackPage)); break;
-                case "search": Frame.Navigate(typeof(SearchPage)); break;
             }
         }
-        private void OnMenuTileSizeChanged(object sender, SizeChangedEventArgs e) { var tile = (Button)sender; if (tile.ActualWidth > 0 && Math.Abs(tile.Height - tile.ActualWidth) > 0.5) tile.Height = tile.ActualWidth; }
-        private void OnMenuClick(object sender, RoutedEventArgs e) { Navigate(((Button)sender).Tag as string); }
-        private void OnSearchClick(object sender, RoutedEventArgs e) { Frame.Navigate(typeof(SearchPage)); }
-        private void OnSettingsClick(object sender, RoutedEventArgs e) { Frame.Navigate(typeof(SettingsPage)); }
-        private async void OnRefreshClick(object sender, RoutedEventArgs e) { await LoadHome(); }
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e) { ResizeSections(); }
-        private void ResizeSections() { if (ActualWidth > 0) { PlaySection.Width = ActualWidth * 420 / 480; MusicSection.Width = ActualWidth * 360 / 480; } }
+        private void OnMenuClick(object sender, RoutedEventArgs args) { Navigate(((Button)sender).Tag as string); }
+        private void OnSettingsClick(object sender, RoutedEventArgs args) { Frame.Navigate(typeof(SettingsPage)); }
+        private async void OnHelpClick(object sender, RoutedEventArgs args) { await new MessageDialog(PhoneText.Get("AboutMessage"), PhoneText.Get("UiMixDrome")).ShowAsync(); }
+        private void OnSizeChanged(object sender, SizeChangedEventArgs args) { ResizeSections(); }
+        private void ResizeSections()
+        {
+            if (ActualWidth <= 0) return;
+            var scale = ActualWidth / 480;
+            Sections.Margin = new Thickness(24 * scale, 168 * scale, 96 * scale, 0);
+            PlaySection.Width = 432 * scale; HomeTiles.Width = 420 * scale; MenuSection.Width = 360 * scale;
+            Wordmark.FontSize = 64 * scale; Wordmark.Margin = new Thickness(20 * scale, 7 * scale, 0, 0);
+            HomeHeader.Height = 168 * scale;
+            MenuRowOne.Height = MenuRowTwo.Height = MenuRowThree.Height = new GridLength(180 * scale);
+            foreach (var tile in new[] { MixesTile, CreateTile, FavouritesTile, MusicTile, OfflineTile })
+            {
+                tile.Height = 168 * scale; tile.Margin = new Thickness(0, 0, 12 * scale, 12 * scale);
+                tile.Width = (tile == FavouritesTile ? 348 : 168) * scale;
+                tile.HorizontalAlignment = HorizontalAlignment.Left;
+                var grid = (Grid)tile.Content;
+                foreach (var child in grid.Children.OfType<TextBlock>())
+                {
+                    child.FontSize = 21 * scale; child.LineHeight = 22 * scale; child.MaxHeight = 44 * scale;
+                    child.Margin = new Thickness(12 * scale, 12 * scale, 12 * scale, 12 * scale);
+                }
+            }
+            ArtistBackdrop.Width = ActualWidth * 1.18; ArtistBackdrop.Height = ActualHeight;
+        }
+        private void OnPanoramaViewChanged(object sender, ScrollViewerViewChangedEventArgs args)
+        {
+            BackdropTranslation.X = -Panorama.HorizontalOffset * 0.18;
+            MenuBar.Visibility = Panorama.HorizontalOffset >= PlaySection.Width * 0.5 ? Visibility.Visible : Visibility.Collapsed;
+            if (!args.IsIntermediate)
+            {
+                var target = Panorama.HorizontalOffset >= PlaySection.Width * 0.5 ? Math.Min(PlaySection.Width, Panorama.ScrollableWidth) : 0;
+                if (Math.Abs(Panorama.HorizontalOffset - target) > 0.5) Panorama.ChangeView(target, null, null, false);
+            }
+        }
     }
 }

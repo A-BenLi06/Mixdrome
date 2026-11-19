@@ -35,7 +35,11 @@ namespace Mixdrome.Phone.Views
         public ObservableCollection<PhoneLibraryItem> Genres { get; private set; } = new ObservableCollection<PhoneLibraryItem>();
         public ObservableCollection<PhoneLibraryItem> Playlists { get; private set; } = new ObservableCollection<PhoneLibraryItem>();
 
-        public LibraryPage() { InitializeComponent(); DataContext = this; }
+        public LibraryPage()
+        {
+            InitializeComponent(); DataContext = this;
+            SectionBar.Title = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToUpper(PhoneText.Get("UiMyMusic"));
+        }
         private string Tab { get { var item = LibraryPivot.SelectedItem as PivotItem; return item == null ? "artists" : item.Tag as string; } }
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {

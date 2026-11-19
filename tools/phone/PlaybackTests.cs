@@ -43,7 +43,9 @@ public static class PhonePlaybackTests
         Check(!queue.Select(-1) && queue.CurrentIndex==1,"invalid selection preserves");
         Check(!queue.Replace(new List<TrackInfo>{null},0) && queue.CurrentIndex==1,"invalid replace preserves");
         var snapshot = new AudioQueueSnapshot { Version="version", Tracks=Tracks(3) };
+        snapshot.Tracks[1].IsMix = true; snapshot.Tracks[1].MixTitle = "Mix & 音";
         var roundtrip=AudioJson.Deserialize<AudioQueueSnapshot>(AudioJson.Serialize(snapshot));
+        Check(roundtrip.Tracks[1].IsMix && roundtrip.Tracks[1].MixTitle == "Mix & 音" && !roundtrip.Tracks[0].IsMix, "mix presentation survives background queue persistence without changing ordinary songs");
         Check(roundtrip.Version=="version" && roundtrip.Tracks.Count==3 && roundtrip.Tracks[2].Title=="Track 2", "queue wire roundtrip");
         Check(queue.Replace(Tracks(1),0),"single track");
         Check(queue.Next(true) && queue.CurrentIndex==0,"single repeat all");

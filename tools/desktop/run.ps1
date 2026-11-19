@@ -35,10 +35,10 @@ if (-not $NoBuild) {
     Stop-WorkspaceClient
     if (-not (Test-Path -LiteralPath $MSBuildPath)) { throw 'Supply -MSBuildPath for the legacy Windows 8.1 build toolchain.' }
     $buildLog = Join-Path $outputRoot 'build.log'
-    # MSBuild 14 can reuse CoreCompile outputs when a conditional Compile item
-    # disappears. Changing the probe define must invalidate that cached binary.
-    $buildTarget = if ($previousMode -ne $buildMode) { 'Rebuild' } else { 'Build' }
-    & $MSBuildPath (Join-Path $clientRoot 'Mixdrome.csproj') "/t:$buildTarget" "/p:Configuration=$Configuration" "/p:Platform=$Architecture" "/p:NativeUiProbe=$(($NativeUiProbe -or $NativeUiObserve).ToString().ToLowerInvariant())" "/p:NativeUiObserve=$($NativeUiObserve.IsPresent.ToString().ToLowerInvariant())" "/p:NativePlaybackProbe=$($NativePlaybackProbe.IsPresent.ToString().ToLowerInvariant())" /m /v:quiet /nologo /fl "/flp:logfile=$buildLog;verbosity=normal"
+    # MSBuild 14 can reuse CoreCompile outputs and previously packaged appx files
+    # across incremental edits or probe define toggles. Always rebuild and pack.
+    $buildTarget = 'Rebuild'
+    & $MSBuildPath (Join-Path $clientRoot 'Mixdrome.csproj') "/t:$buildTarget" "/p:Configuration=$Configuration" "/p:Platform=$Architecture" "/p:GenerateAppxPackageOnBuild=true" "/p:NativeUiProbe=$(($NativeUiProbe -or $NativeUiObserve).ToString().ToLowerInvariant())" "/p:NativeUiObserve=$($NativeUiObserve.IsPresent.ToString().ToLowerInvariant())" "/p:NativePlaybackProbe=$($NativePlaybackProbe.IsPresent.ToString().ToLowerInvariant())" /m /v:quiet /nologo /fl "/flp:logfile=$buildLog;verbosity=normal"
     if ($LASTEXITCODE -ne 0) { throw "Desktop build failed. See $buildLog" }
     Set-Content -LiteralPath $modeFile -Value $buildMode -Encoding utf8NoBOM
 }
@@ -64,18 +64,44 @@ foreach ($candidate in (Get-ChildItem -LiteralPath (Join-Path $clientRoot 'AppPa
     } finally { $archive.Dispose() }
 }
 if (-not $package) { throw 'No appx matches the built package identity; stale packages will not be deployed.' }
+$builtExe = Join-Path $clientRoot (Join-Path $builtOutput 'Mixdrome.exe')
+if (-not (Test-Path -LiteralPath $builtExe)) { throw "Built binary is missing: $builtExe" }
+$builtExeHash = (Get-FileHash -LiteralPath $builtExe -Algorithm SHA256).Hash
+$archive = [IO.Compression.ZipFile]::OpenRead($package.FullName)
+try {
+    $exeEntry = $archive.GetEntry('Mixdrome.exe')
+    if (-not $exeEntry) { throw "Package $($package.FullName) does not contain Mixdrome.exe." }
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try {
+        $entryStream = $exeEntry.Open()
+        try {
+            $packagedHash = [BitConverter]::ToString($sha.ComputeHash($entryStream)).Replace('-', '')
+        } finally {
+            $entryStream.Dispose()
+        }
+    } finally {
+        $sha.Dispose()
+    }
+} finally {
+    $archive.Dispose()
+}
+if ($packagedHash -ne $builtExeHash) {
+    throw "Selected appx $($package.FullName) holds stale Mixdrome.exe ($packagedHash != $builtExeHash)."
+}
 $layoutRoot = Join-Path $outputRoot ([Guid]::NewGuid().ToString('N'))
 if ($existingRegistration) {
     $registeredRoot = [IO.Path]::GetFullPath($existingRegistration.InstallLocation)
-    if (-not $registeredRoot.StartsWith($projectRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+    if ($registeredRoot.StartsWith($projectRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+        $layoutRoot = $registeredRoot
+        Stop-WorkspaceClient
+    } elseif ([version]$identity.Version -le [version]$existingRegistration.Version) {
         throw 'The existing app is registered outside this workspace. Build a higher package version before changing its registration.'
     }
-    $layoutRoot = $registeredRoot
-    Stop-WorkspaceClient
 }
 New-Item -ItemType Directory -Path $layoutRoot -Force | Out-Null
 $archive = [IO.Compression.ZipFile]::OpenRead($package.FullName)
 $unchangedFiles = 0
+$updatedFiles = 0
 try {
     foreach ($entry in $archive.Entries) {
         if (-not $entry.Name) { continue }
@@ -96,11 +122,12 @@ try {
             }
         }
         [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $destination, $true)
+        $updatedFiles++
     }
 } finally { $archive.Dispose() }
 $layoutManifest = Join-Path $layoutRoot 'AppxManifest.xml'
 $registrationReused = $existingRegistration -and $existingRegistration.IsDevelopmentMode -and
-    ([version]$existingRegistration.Version -eq [version]$identity.Version)
+    ([version]$existingRegistration.Version -eq [version]$identity.Version) -and ($updatedFiles -eq 0)
 if (-not $registrationReused) {
     Add-AppxPackage -Register $layoutManifest -ForceApplicationShutdown -ForceUpdateFromAnyVersion -ErrorAction Stop
 }

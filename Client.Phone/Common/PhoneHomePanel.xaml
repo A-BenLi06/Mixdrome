@@ -1,84 +1,31 @@
-<UserControl x:Class="Mixdrome.Phone.Common.PhoneHomePanel"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <ScrollViewer VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled" ZoomMode="Disabled">
-        <StackPanel>
-            <Grid x:Name="TileGrid">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition x:Name="LargeTileColumn" Width="*" />
-                    <ColumnDefinition x:Name="SmallTileColumn" Width="*" />
-                </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <Button x:Name="PlayMeButton" HorizontalAlignment="Left" Tag="playme"
-                            Style="{StaticResource PhoneHubTileButtonStyle}"
-                            Background="{StaticResource MixRadioAccentBrush}" Click="OnTileClick">
-                        <Grid>
-                            <Viewbox Stretch="Uniform">
-                                <Canvas Width="{StaticResource PhoneHomeLargeTileSize}" Height="{StaticResource PhoneHomeLargeTileSize}">
-                                    <Path Data="F1 M 158.609,110.590 L 82.246,154.688 C 79.619,156.201 77.465,154.963 77.465,151.941 L 77.465,63.744 C 77.465,60.712 79.619,59.461 82.246,60.982 L 158.609,105.078 C 161.236,106.596 161.236,109.077 158.609,110.590" Fill="White" />
-                                </Canvas>
-                            </Viewbox>
-                            <TextBlock x:Uid="PhoneUi_Text_PlayMe" Style="{StaticResource PhoneLargeTileLabelStyle}" />
-                        </Grid>
-                    </Button>
-                    <Button x:Name="MixesButton" HorizontalAlignment="Right" Tag="playlists"
-                            Style="{StaticResource PhoneHubTileButtonStyle}" Click="OnTileClick">
-                        <Grid>
-                            <Image Source="/Assets/MixRadio/MixesTileIcon.png" Stretch="Uniform" />
-                            <TextBlock x:Uid="PhoneUi_Text_Mixes" Style="{StaticResource PhoneTileLabelStyle}" />
-                        </Grid>
-                    </Button>
-                    <Grid x:Name="RecentTileThree" HorizontalAlignment="Right">
-                        <Rectangle x:Name="RecentPlaceholderThree" Fill="{ThemeResource PhoneAccentBrush}" Opacity="0.6" />
-                        <Button x:Name="RecentAlbumThree" IsEnabled="False" Visibility="Collapsed"
-                                Style="{StaticResource PhoneHubTileButtonStyle}" Click="OnRecentClick">
-                            <Grid>
-                                <Image x:Name="RecentImageThree" Stretch="UniformToFill" />
-                                <TextBlock x:Name="RecentTitleThree" Style="{StaticResource PhoneRecentTitleStyle}" VerticalAlignment="Bottom" />
-                            </Grid>
-                        </Button>
-                    </Grid>
-                </StackPanel>
-                <StackPanel x:Name="OffsetColumn" Grid.Column="1">
-                    <Grid x:Name="RecentTileOne" HorizontalAlignment="Left">
-                        <Rectangle x:Name="RecentPlaceholderOne" Fill="{ThemeResource PhoneAccentBrush}" Opacity="0.6" />
-                        <Button x:Name="RecentAlbumOne" IsEnabled="False" Visibility="Collapsed"
-                                Style="{StaticResource PhoneHubTileButtonStyle}" Click="OnRecentClick">
-                            <Grid>
-                                <Image x:Name="RecentImageOne" Stretch="UniformToFill" />
-                                <TextBlock x:Name="RecentTitleOne" Style="{StaticResource PhoneRecentTitleStyle}" VerticalAlignment="Bottom" />
-                            </Grid>
-                        </Button>
-                    </Grid>
-                    <Button x:Name="MyMusicButton" HorizontalAlignment="Left" Tag="library"
-                            Style="{StaticResource PhoneHubTileButtonStyle}" Click="OnTileClick">
-                        <Grid>
-                            <Image Source="/Assets/MixRadio/MyMusicTileIcon.png" Stretch="Uniform" />
-                            <TextBlock x:Uid="PhoneUi_Text_MyMusic" Style="{StaticResource PhoneTileLabelStyle}" />
-                        </Grid>
-                    </Button>
-                    <Grid x:Name="RecentTileTwo" HorizontalAlignment="Left">
-                        <Rectangle x:Name="RecentPlaceholderTwo" Fill="{ThemeResource PhoneAccentBrush}" Opacity="0.6" />
-                        <Button x:Name="RecentAlbumTwo" IsEnabled="False" Visibility="Collapsed"
-                                Style="{StaticResource PhoneHubTileButtonStyle}" Click="OnRecentClick">
-                            <Grid>
-                                <Image x:Name="RecentImageTwo" Stretch="UniformToFill" />
-                                <TextBlock x:Name="RecentTitleTwo" Style="{StaticResource PhoneRecentTitleStyle}" VerticalAlignment="Bottom" />
-                            </Grid>
-                        </Button>
-                    </Grid>
-                    <Button x:Name="FavouritesButton" HorizontalAlignment="Left" Tag="favourites"
-                            Style="{StaticResource PhoneHubTileButtonStyle}" Click="OnTileClick">
-                        <Grid>
-                            <Image Source="/Assets/MixRadio/FavouritesTileIcon.png" Stretch="Uniform" />
-                            <TextBlock x:Uid="PhoneUi_Text_Favourites" Style="{StaticResource PhoneTileLabelStyle}" />
-                        </Grid>
-                    </Button>
-                </StackPanel>
-            </Grid>
-            <Button Tag="recent" Style="{StaticResource MixRadioFlatButtonStyle}" Click="OnTileClick" MinHeight="48">
-                <TextBlock x:Uid="PhoneUi_Text_RecentlyPlayed" Style="{StaticResource TitleTextStyle}" />
-            </Button>
-        </StackPanel>
-    </ScrollViewer>
+<UserControl x:Class="Mixdrome.Phone.Common.PhoneHomePanel" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Mixdrome.Phone.Common">
+  <Grid x:Name="TileGrid">
+   <Grid.ColumnDefinitions><ColumnDefinition x:Name="LargeTileColumn"/><ColumnDefinition x:Name="SmallTileColumn"/></Grid.ColumnDefinitions>
+   <StackPanel>
+    <Button x:Name="PlayMeButton" Tag="playme" HorizontalAlignment="Left" Style="{StaticResource PhoneHubTileButtonStyle}" Background="{StaticResource MixRadioPlayMeBrush}" Click="OnTileClick">
+     <Grid>
+      <Image x:Name="PlayMeImage" Source="/Assets/MixRadio/PlayMeTileIcon.png" Stretch="Uniform"/>
+      <TextBlock x:Name="PlayMeLabel" x:Uid="PhoneUi_Text_PlayMe" Style="{StaticResource PhoneLargeTileLabelStyle}"/>
+      <Grid x:Name="CurrentClip" Background="{ThemeResource PhoneAccentBrush}" Visibility="Collapsed">
+       <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+       <Image x:Name="CurrentImage" Grid.RowSpan="2" Stretch="UniformToFill" ImageFailed="OnCurrentImageFailed"/>
+       <Rectangle x:Name="CurrentShade" Grid.RowSpan="2" Fill="Black" Opacity="0.1"/>
+       <StackPanel x:Name="CurrentTitlePanel" Margin="0,-6,-12,0" Visibility="Collapsed">
+        <TextBlock x:Name="CurrentTitle" FontFamily="{StaticResource PhoneReferenceSemiBoldFontFamily}" FontWeight="SemiBold" Foreground="White" FontSize="24" TextWrapping="Wrap" Margin="12,12,12,0" MaxHeight="68"/>
+       </StackPanel>
+       <local:PhoneProgressCounter x:Name="CurrentProgress" Grid.Row="1"/>
+      </Grid>
+     </Grid>
+    </Button>
+    <Button x:Name="CreateMixButton" Tag="create" HorizontalAlignment="Right" Style="{StaticResource PhoneHubTileButtonStyle}" Click="OnTileClick"><Grid><Image x:Name="CreateMixImage" Source="/Assets/MixRadio/CreateTileIcon.png" Stretch="Uniform"/><TextBlock x:Name="CreateMixLabel" Style="{StaticResource PhoneTileLabelStyle}"/></Grid></Button>
+    <Button x:Name="RecentAlbumThree" HorizontalAlignment="Right" Style="{StaticResource PhoneHubTileButtonStyle}" Background="Transparent" Click="OnRecentClick"><Image x:Name="RecentImageThree" Stretch="UniformToFill"/></Button>
+    <Button x:Name="RecentLink" Tag="recent" HorizontalAlignment="Left" Style="{StaticResource MixRadioFlatButtonStyle}" Click="OnTileClick"><TextBlock x:Name="RecentLabel" x:Uid="PhoneUi_Text_RecentlyPlayed" Foreground="White"/></Button>
+   </StackPanel>
+   <StackPanel x:Name="OffsetColumn" Grid.Column="1">
+    <Button x:Name="RecentAlbumOne" HorizontalAlignment="Left" Style="{StaticResource PhoneHubTileButtonStyle}" Background="Transparent" Click="OnRecentClick"><Image x:Name="RecentImageOne" Stretch="UniformToFill"/></Button>
+    <Button x:Name="MixOneButton" HorizontalAlignment="Left" Tag="mixes" Style="{StaticResource PhoneHubTileButtonStyle}" Click="OnTileClick"><Grid><Image x:Name="MixOneImage" Source="/Assets/MixRadio/MixesTileIcon.png" Stretch="UniformToFill"/><Grid x:Name="MixOneBand" Height="50" VerticalAlignment="Bottom" Visibility="Collapsed"><Border Background="{ThemeResource PhoneAccentBrush}" Opacity="0.6"/><TextBlock x:Name="MixOneLabel" Style="{StaticResource PhoneTileLabelStyle}" VerticalAlignment="Center" Margin="12,0"/></Grid></Grid></Button>
+    <Button x:Name="RecentAlbumTwo" HorizontalAlignment="Left" Style="{StaticResource PhoneHubTileButtonStyle}" Background="Transparent" Click="OnRecentClick"><Image x:Name="RecentImageTwo" Stretch="UniformToFill"/></Button>
+    <Button x:Name="MixTwoButton" HorizontalAlignment="Left" Tag="offline" Style="{StaticResource PhoneHubTileButtonStyle}" Click="OnTileClick"><Grid><Image x:Name="MixTwoImage" Source="/Assets/MixRadio/OfflineTileIcon.png" Stretch="UniformToFill"/><Grid x:Name="MixTwoBand" Height="50" VerticalAlignment="Bottom" Visibility="Collapsed"><Border Background="{ThemeResource PhoneAccentBrush}" Opacity="0.6"/><TextBlock x:Name="MixTwoLabel" Style="{StaticResource PhoneTileLabelStyle}" VerticalAlignment="Center" Margin="12,0"/></Grid></Grid></Button>
+   </StackPanel>
+  </Grid>
 </UserControl>

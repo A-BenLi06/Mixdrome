@@ -20,7 +20,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Production phone audio assertions failed.' }
 # reducer. Indented method boundaries keep the extracted bodies byte-for-byte
 # intact; changing a signature or adding an overload requires reviewing this list.
 $pageSource = [IO.File]::ReadAllText((Join-Path $projectRoot 'Client.Phone\Views\PlaybackPage.xaml.cs'))
-$pageMethods = @('ApplyStateAsync', 'ShowTrack', 'OnArtworkImageFailed', 'DetachArtwork', 'ResetDisplay', 'UpdatePlaybackState', 'UpdateProgress', 'ApplyProgress', 'ResetProgress', 'IsMediaNotReady', 'OnProgressTimerTick', 'FormatTime', 'Send', 'OnNavigatedTo', 'OnNavigatedFrom', 'OnQueueListLoaded', 'OnQueueListUnloaded', 'DetachQueueItems', 'OnQueueItemsChanged', 'SynchronizeQueueSelection')
+$pageMethods = @('ApplyStateAsync', 'ShowTrack', 'OnArtworkImageFailed', 'DetachArtwork', 'ResetDisplay', 'UpdatePlaybackState', 'UpdateProgress', 'ApplyProgress', 'ResetProgress', 'IsMediaNotReady', 'OnProgressTimerTick', 'FormatTime', 'Send', 'OnNavigatedTo', 'OnNavigatedFrom', 'OnQueueListLoaded', 'OnQueueListUnloaded', 'DetachQueueItems', 'OnQueueItemsChanged', 'SynchronizeQueueSelection', 'BeginTrackPresentation', 'IsCurrentPresentation', 'MatchesPlaybackAccount', 'OnArtistImageFailed', 'DetachArtistImage', 'UpdateFeedbackControls', 'SaveFeedbackAsync', 'LoadLyricsAsync', 'OnShareDataRequested', 'CreateLocalQueueServiceAsync', 'OnArtistImageOpened', 'OnPendingArtistImageFailed', 'DetachPendingArtistImage', 'ClearArtistBackground', 'CanSaveOfflineMix', 'UpdateOfflineMixCommand', 'StartOfflineMixAsync')
 $extractedMethods = foreach ($method in $pageMethods) {
     $methodPattern = '(?ms)^        (?:private|protected) [^\r\n]*\b' + [regex]::Escape($method) + '\([^\r\n]*\)\r?\n        \{.*?^        \}'
     $methodMatches = [regex]::Matches($pageSource, $methodPattern)
@@ -36,6 +36,7 @@ $pageExecutable = Join-Path $outputDirectory 'phone-player-state.exe'
 $pageSources = @(
     (Join-Path $projectRoot 'Client.Phone\Services\BackgroundAudioMessages.cs'),
     (Join-Path $projectRoot 'Client.Phone\Services\AudioQueueState.cs'),
+    (Join-Path $projectRoot 'Client.Common\Services\AccountIdentity.cs'),
     $pageHarness
 )
 & $CompilerPath /nologo /main:PhonePlayerStateTests "/out:$pageExecutable" @pageSources /r:System.Runtime.Serialization.dll

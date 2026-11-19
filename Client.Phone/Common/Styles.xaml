@@ -18,12 +18,20 @@
     <x:Double x:Key="PhoneHomeTileGap">12</x:Double>
     <x:Double x:Key="PhoneHomeSecondColumnOffset">24</x:Double>
 
+    <FontFamily x:Key="PhoneReferenceNormalFontFamily">Segoe WP</FontFamily>
+    <FontFamily x:Key="PhoneReferenceLightFontFamily">Segoe WP</FontFamily>
+    <FontFamily x:Key="PhoneReferenceSemiLightFontFamily">Segoe WP</FontFamily>
+    <FontFamily x:Key="PhoneReferenceSemiBoldFontFamily">Segoe WP</FontFamily>
+    <FontFamily x:Key="PhoneReferenceBlackFontFamily">Segoe WP</FontFamily>
+
     <SolidColorBrush x:Key="ApplicationPageBackgroundThemeBrush" Color="{StaticResource MixRadioBlackColor}" />
     <SolidColorBrush x:Key="ApplicationForegroundThemeBrush" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="PhoneForegroundBrush" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="PhoneMidBrush" Color="#FFCFCFCF" />
     <SolidColorBrush x:Key="PhoneDisabledBrush" Color="#FF777777" />
-    <SolidColorBrush x:Key="MixRadioAccentBrush" Color="{StaticResource MixRadioAccentColor}" />
+    <SolidColorBrush x:Key="MixRadioAccentBrush" Color="{ThemeResource SystemColorControlAccentColor}" />
+    <SolidColorBrush x:Key="MixRadioFeedbackBrush" Color="{StaticResource MixRadioAccentColor}" />
+    <SolidColorBrush x:Key="MixRadioPlayMeBrush" Color="{StaticResource MixRadioAccentColor}" />
     <SolidColorBrush x:Key="MixRadioAccentDarkBrush" Color="{StaticResource MixRadioAccentDarkColor}" />
     <SolidColorBrush x:Key="MixRadioTealBrush" Color="{StaticResource MixRadioTealColor}" />
     <SolidColorBrush x:Key="MixRadioYellowBrush" Color="{StaticResource MixRadioYellowColor}" />
@@ -256,10 +264,10 @@
         <Setter Property="Margin" Value="0,0,0,8" />
     </Style>
 <Style x:Key="PhoneTileLabelStyle" TargetType="TextBlock">
-<Setter Property="FontSize" Value="21" /><Setter Property="FontWeight" Value="SemiBold" /><Setter Property="Foreground" Value="White" /><Setter Property="VerticalAlignment" Value="Bottom" /><Setter Property="Margin" Value="9,0,9,8" /><Setter Property="TextWrapping" Value="Wrap" /><Setter Property="MaxLines" Value="2" />
+<Setter Property="FontFamily" Value="{StaticResource PhoneReferenceSemiBoldFontFamily}" /><Setter Property="FontSize" Value="21" /><Setter Property="FontWeight" Value="SemiBold" /><Setter Property="CharacterSpacing" Value="0" /><Setter Property="LineHeight" Value="22" /><Setter Property="LineStackingStrategy" Value="BlockLineHeight" /><Setter Property="Foreground" Value="White" /><Setter Property="VerticalAlignment" Value="Bottom" /><Setter Property="Margin" Value="12" /><Setter Property="TextWrapping" Value="Wrap" /><Setter Property="MaxHeight" Value="44" /><Setter Property="TextTrimming" Value="WordEllipsis" />
 </Style>
 <Style x:Key="PhoneLargeTileLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource PhoneTileLabelStyle}">
-<Setter Property="FontSize" Value="24" /><Setter Property="LineHeight" Value="25" />
+<Setter Property="FontSize" Value="24" /><Setter Property="LineHeight" Value="25" /><Setter Property="MaxHeight" Value="132" />
 </Style>
 <Style x:Key="PhoneRecentTitleStyle" TargetType="TextBlock"><Setter Property="FontSize" Value="14" /><Setter Property="Foreground" Value="White" /><Setter Property="Margin" Value="4" /><Setter Property="TextTrimming" Value="CharacterEllipsis" /><Setter Property="MaxLines" Value="2" /></Style>
 <Style x:Key="PhoneTileGlyphStyle" TargetType="TextBlock"><Setter Property="FontFamily" Value="Segoe UI Symbol" /><Setter Property="FontSize" Value="40" /><Setter Property="Foreground" Value="White" /><Setter Property="HorizontalAlignment" Value="Center" /><Setter Property="VerticalAlignment" Value="Center" /></Style>

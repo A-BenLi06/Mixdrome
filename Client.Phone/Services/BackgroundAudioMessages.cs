@@ -50,6 +50,8 @@ namespace Mixdrome.Phone.Services
         [DataMember] public string CoverArt { get; set; }
         [DataMember] public string StreamUrl { get; set; }
         [DataMember] public int Duration { get; set; }
+        [DataMember(EmitDefaultValue = false)] public bool IsMix { get; set; }
+        [DataMember(EmitDefaultValue = false)] public string MixTitle { get; set; }
         [DataMember(EmitDefaultValue = false)] public PhoneReportingProfile Reporting { get; set; }
     }
 

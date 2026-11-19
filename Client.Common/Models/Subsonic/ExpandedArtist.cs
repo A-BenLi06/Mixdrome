@@ -21,6 +21,9 @@
         [XmlAttribute("albumCount")]
         public int AlbumCount { get; set; }
 
+        [XmlAttribute("artistImageUrl")]
+        public string ArtistImageUrl { get; set; }
+
         [XmlElement(ElementName = "album", Namespace = "http://subsonic.org/restapi")]
         public List<Album> Albums { get; set; }
 

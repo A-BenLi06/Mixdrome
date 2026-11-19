@@ -217,4 +217,63 @@
 <data name="Phone_Text_PlayLibraryItem" xml:space="preserve"><value>播放 {0}</value></data>
 <data name="Phone_Text_OpenLibraryItem" xml:space="preserve"><value>打开 {0}</value></data>
 <data name="PhoneUi_Text_ShuffleAll.Text" xml:space="preserve"><value>全部随机播放</value></data>
+<data name="PhoneUi_Brand_Lead.Text" xml:space="preserve"><value>Mix</value></data>
+<data name="PhoneUi_Brand_Tail.Text" xml:space="preserve"><value>drome</value></data>
+<data name="Phone_Text_UiHome" xml:space="preserve"><value>首页</value></data>
+<data name="Phone_Text_UiCreateMix" xml:space="preserve"><value>创建精选集</value></data>
+<data name="Phone_Text_UiOfflineMixes" xml:space="preserve"><value>离线精选集</value></data>
+<data name="PhoneUi_Text_CreateMix.Text" xml:space="preserve"><value>创建精选集</value></data>
+<data name="PhoneUi_Text_OfflineMixes.Text" xml:space="preserve"><value>离线精选集</value></data>
+<data name="PhoneUi_Label_Settings.Label" xml:space="preserve"><value>设置</value></data>
+<data name="PhoneUi_Label_Help.Label" xml:space="preserve"><value>帮助</value></data>
+<data name="Phone_Text_AboutMessage" xml:space="preserve"><value>连接 Navidrome 或 Subsonic 服务器，聆听音乐、创建精选集并保存供离线收听。</value></data>
+<data name="Phone_Text_PlayMeTitle" xml:space="preserve"><value>为我播放</value></data>
+<data name="Phone_Text_LikeSong" xml:space="preserve"><value>喜欢这首歌</value></data>
+<data name="Phone_Text_DislikeSong" xml:space="preserve"><value>不喜欢这首歌</value></data>
+<data name="Phone_Text_FavouriteSong" xml:space="preserve"><value>收藏歌曲</value></data>
+<data name="Phone_Text_LikedSongTitle" xml:space="preserve"><value>好歌！</value></data>
+<data name="Phone_Text_LikedSongMessage" xml:space="preserve"><value>已在服务器上评为 5 星。</value></data>
+<data name="Phone_Text_DislikedSongTitle" xml:space="preserve"><value>已跳过歌曲</value></data>
+<data name="Phone_Text_DislikedSongMessage" xml:space="preserve"><value>已在服务器上评为 1 星。</value></data>
+<data name="Phone_Text_FeedbackFailed" xml:space="preserve"><value>无法保存反馈，请重试。</value></data>
+<data name="Phone_Text_UiOk" xml:space="preserve"><value>确定</value></data>
+<data name="Phone_Text_ShareSong" xml:space="preserve"><value>分享歌曲</value></data>
+<data name="Phone_Text_Lyrics" xml:space="preserve"><value>歌词</value></data>
+<data name="Phone_Text_NoLyrics" xml:space="preserve"><value>这首歌暂无歌词。</value></data>
+<data name="Phone_Text_LyricsFailed" xml:space="preserve"><value>无法加载歌词，请重试。</value></data>
+<data name="Phone_Text_UiWhatsNew" xml:space="preserve"><value>最新动态</value></data>
+<data name="Phone_Text_UiFeatured" xml:space="preserve"><value>精选</value></data>
+<data name="Phone_Text_UiCategories" xml:space="preserve"><value>类别</value></data>
+<data name="Phone_Text_FavouriteUpdatesEmpty" xml:space="preserve"><value>收藏艺人在媒体库中的新专辑会显示在这里。</value></data>
+<data name="PhoneUi_Label_AddArtist.Label" xml:space="preserve"><value>添加艺人</value></data>
+<data name="PhoneUi_Label_SelectArtists.Label" xml:space="preserve"><value>选择</value></data>
+<data name="Phone_Text_AddArtist" xml:space="preserve"><value>添加艺人</value></data>
+<data name="Phone_Text_Add" xml:space="preserve"><value>添加</value></data>
+<data name="Phone_Text_Cancel" xml:space="preserve"><value>取消</value></data>
+<data name="Phone_Text_NoArtistsToAdd" xml:space="preserve"><value>媒体库中的艺人均已收藏。</value></data>
+<data name="PhoneUi_Label_RemoveFavourites.Label" xml:space="preserve"><value>移除</value></data>
+<data name="PhoneUi_Label_Done.Label" xml:space="preserve"><value>完成</value></data>
+<data name="Phone_Text_CreateMixTitle" xml:space="preserve"><value>创建混音</value></data>
+<data name="Phone_Text_MixName" xml:space="preserve"><value>混音名称</value></data>
+<data name="Phone_Text_CreateMixDescription" xml:space="preserve"><value>选择流派，从音乐库中创建混音并保存为播放列表。</value></data>
+<data name="Phone_Text_CreateMixAction" xml:space="preserve"><value>创建并播放</value></data>
+<data name="Phone_Text_AllGenres" xml:space="preserve"><value>所有流派</value></data>
+<data name="Phone_Text_MixNameRequired" xml:space="preserve"><value>请输入此混音的名称。</value></data>
+<data name="Phone_Text_MixCreated" xml:space="preserve"><value>已保存“{0}”，共 {1} 首歌曲。</value></data>
+<data name="Phone_Text_OfflineMixesTitle" xml:space="preserve"><value>离线混音</value></data>
+<data name="Phone_Text_OfflineMixesHint" xml:space="preserve"><value>在混音页面长按混音，即可离线保存。</value></data>
+<data name="Phone_Text_OfflineDownloadingHint" xml:space="preserve"><value>下载期间请保持此页面打开。</value></data>
+<data name="Phone_Text_CancelDownload" xml:space="preserve"><value>取消下载</value></data>
+<data name="Phone_Text_NoOfflineMixes" xml:space="preserve"><value>尚未保存可供离线收听的混音。</value></data>
+<data name="Phone_Text_OfflineDownloadComplete" xml:space="preserve"><value>已可离线收听。</value></data>
+<data name="Phone_Text_OfflineDownloadCancelled" xml:space="preserve"><value>下载已取消。</value></data>
+<data name="Phone_Text_OfflineDownloadFailed" xml:space="preserve"><value>下载失败：{0}</value></data>
+<data name="Phone_Text_OfflineDownloadProgress" xml:space="preserve"><value>正在下载… {0}/{1}</value></data>
+<data name="Phone_Text_OfflineDataInvalid" xml:space="preserve"><value>已保存的混音数据无效。</value></data>
+<data name="Phone_Text_OfflineFileMissing" xml:space="preserve"><value>此混音的文件已丢失或更改，请重新下载。</value></data>
+<data name="Phone_Text_DownloadingUnavailable" xml:space="preserve"><value>此账户没有下载音乐的权限。</value></data>
+<data name="Phone_Text_OfflineAudioOnly" xml:space="preserve"><value>离线混音只能包含音频歌曲。</value></data>
+<data name="Phone_Text_OfflineAccountChanged" xml:space="preserve"><value>账户或服务器已更改，请重新打开此页面后继续。</value></data>
+<data name="Phone_Text_RemoveOfflineMix" xml:space="preserve"><value>删除离线混音</value></data>
+<data name="Phone_Text_SaveOfflineMix" xml:space="preserve"><value>保存供离线收听</value></data>
 </root>

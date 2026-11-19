@@ -595,3 +595,120 @@
 - 普通原生包实际输入与截图验收：艺术家标题进入正确3张专辑；专辑右上播放图标与歌曲整行排版；实际直接播放和元数据；进度持续刷新，暂停停在0:52，拖动到0:30仍暂停，恢复后自动换到PCM；首次打开queue显示2曲，点击首曲重新播放，暂停0:40且标题/下一首状态匹配。最终包130/131/132帧显示默认PNG、真实曲目及正常进度，并保持暂停1:05，无错误提示。实际PNG封面和背景在115帧正常渲染，随机图标为已开启的粉色。
 - 完整性：原生ShuffleAll持久队列127首/127唯一ID，与实际曲库集合完全相同，遗漏/额外均0；两次100+27分页顺序稳定、无重叠。隔离服务只读播放计数确认原25首及90秒MP3/PCM均收到真实达标submission记录，没有用测试请求制造scrobble。监听落库不代表耳听输出、锁屏或系统中断验收。
 - 证据/限制：新增docs/mixradio/phone-runtime-acceptance.md记录案例、排除帧及验证边界；原始PNG、压缩WebP、源码反证、诊断和构建日志保留于忽略目录.tmp/ui-acceptance/2026-11-16/phone-refinement及.tmp/phone-emulator-fixture。仍无原版匹配运行帧、其它显示尺寸、分组字母跳转、首页迷你播放器转换、真实用户服务器和锁屏/系统媒体中断恢复认证；没有修改全局验收分数。两个SDK截图脚本路径输入错误后均先重取画面才继续，未计为产品失败或沿用旧坐标；转场帧和46开始屏帧不计布局/播放通过。
+
+## 2026-11-17 14:13:55 +08:00 — 依据新增 MixRadio 手机参考图重建页面组成
+
+- 从最新 origin/main 建立 codex/phone-reference-composition。按用户提供的八张 768×1280 原版截图及已解包 XAML，以 480×800 设计坐标适配实际视口：首页封面/时间磁贴、五块菜单（收藏双宽）、艺人背景、轻量顶部栏、精选/分类双列卡、收藏艺人分组和最新动态、Play Me 双控制播放器与粉色反馈层。品牌仍为 Mixdrome，系统主题色沿用系统 accent；照片和名称来自服务器，不植入参考图人物。
+- 对接真实评分、星标、歌词及不含认证流地址的原生文本分享。补 OpenSubsonic artistImageUrl 协议字段和艺人照片回退；首页/标题栏只观察后台队列，按实际 currentIndex 显示，返回不重新起播。状态栏由 App 串行处理导航可见性。
+- 增加真实创建歌单混音与前台离线下载。完整文件落盘后才发布 manifest；账户/来源路由隔离、本地队列不探测网络，下载去重但 QueueIds 保留重复 occurrence；离线上报使用已验证缓存的来源地址。下载离页取消的限制写在实际操作说明中。
+- 验证：14 个生产源码 CLR 回归套件通过；其中手机连接38、封面13、队列39、页面状态65、搜索15、曲库39、上报36、集合19、离线36项断言通过。x86 原生 Debug AppX 构建通过；源码/资源审计通过（59文件、21 XAML、222字符串、259资源、8原有资产）。完整 tools/ci/check.py 的实际检查均运行完，但末尾要求干净 git diff，因此提交后再复跑。
+- 原生首轮截图已发现并修正横向吸附不能离开首页、收藏按钮默认只占单宽、状态栏隐藏传播到设置页，以及图片回退移除绑定等问题。当前构建还需重装后逐页验证上述修正；尚不宣称完成全部原生验收。截图在忽略目录 .tmp/ui-acceptance/2026-11-17/reference-composition，展示前均转换 WebP。私有 Navidrome fixture 的照片/歌单仅作测试，不入产品资产。
+
+## 2026-11-17 15:00:44 +08:00 — 原生截图驱动的排版与命中修正
+
+- 根据023–040原生截图修正真正测量错误：Mixes虚拟化单元格取实际viewport一半，避免分数DIP测量仅排单列；大Pivot标题区、收藏首字母/首照片/最新动态的留白按参考坐标收紧；选择图标改checklist；顶部home图标居中并扩大为完整60×60设计触区。
+- 艺人背景改用独立背景Canvas承载超视口图片，避免平移前被父布局槽裁剪而露黑边。同艺人播放复用已解码图，异艺人新图成功解码后替换，保留账户/代次隔离。播放器照片延伸至透明状态栏；反馈层按参考328高、80图标、204×48确定按钮重新定位。
+- 真实触摸验证发现顶部home点击不进入事件。临时原生日志证明触点在bar内，但命中祖先是越界的Pivot透明RootElement；没有Frame导航失败。将chrome明确置于内容层之上后，同一(30,61)触点在普通构建中成功返回首页并保留菜单位置（067→068）。曾验证的SDK坐标原点假设没有效果，已完全撤销，未留入产品或工具。
+- 所有临时NativeNavigationObserve/指针/UnhandledException诊断已还原，生产源码搜索为零；当前x86普通包已安装，ARM原生Debug构建通过，资源/源码审计通过。页面状态回归增至71项，队列39项通过。详细参考映射和旧截图观察写入docs/mixradio/phone-reference-composition.md，最终数据页面几何与离线操作验收仍在进行。
+- 工具增加真正SDK按下/保持/抬起的Hold动作，沿用观察截图坐标校验和600–2000ms范围，CompileOnly及4项输入前拒绝检查通过。后端只读确认037/040收藏移除后加回，现3位艺人且含Fixture artist1；027操作歌曲Fixture track040的userRating确为5。
+
+## 2026-11-17 16:21:16 +08:00 — 完整视口与真实离线入口
+
+- 原生092确证两列网格：面板自身Loaded/SizeChanged取得真实ScrollViewer视口，单元格按完整DIP向下取整，保留207/225卡片比例，避免旧方案创建时ItemsPanelRoot为null。Mixes去除参考图中没有的底栏，空状态区不占行；收藏艺人页保持完整命令栏，其余页使用Minimal，标题文字基线与checklist尺寸按截图修正。
+- 新增Play Me的真实离线菜单入口：只有完整网络歌曲队列且当前账号/激活/队列版本仍匹配时才能生成下载请求，重复歌曲不去重，缓存表现为真实粉色Play Me卡片。其余歌单/流派仍长按保存。离线页顶部提示保持两行最小高度，下载时显示前台限制，空底部状态折叠；不同高度卡片顶部对齐，状态字体/标签/进度随卡片缩放，播放图标复用既有中性资产。
+- 首页长名称色带随实际文字高度适配，默认50设计单位不变；wordmark上移到参考基线。采样三张原始参考PNG的粉色均为RGB(255,46,129)，现有品牌色仅B差1，反馈层改复用该品牌色。临时截图几何工具独立识别参考黄/本机蓝五块菜单矩形，归一480×800后所有x/y/宽/高delta为0，仅证明外框，不宣称像素分数。
+- 实际长按已下载25首MP3。首次尝试离页时下载已完成，未作为取消通过证据；改用私有代理每16KB延迟250ms后，原生112下载中返回113，ISE dir只剩原先完成目录，未完成目录确实清除。代理限速随后归0。ISE整库快照会被原生图片持有的cover文件阻止，且长桌面输出路径可超旧工具长度限制；无效/不完整快照未用于计数结论，改用明确目录列表核验。
+- 081后一次意外回到开始屏尚未复现，未标记为稳定性通过。临时异常后退出探针和内存探针下，3首[A,B,A]及21首跨艺人[A,B]×10+A均实际播完，末尾暂停/禁用Next，内存约43–47MB/194MB且无未处理异常记录。所有探针已还原；普通x86及ARM Debug重新构建通过，接着执行最终普通包验收。
+- 完整14套CLR回归通过（1211项计数断言，另含10项序列化检查）；手机队列39、页面状态82、集合19、离线36等全部通过。源/资源审计通过：59文件、21 XAML、230字符串查找、259资源、8原有资产。
+
+## 2026-11-17 16:39:46 +08:00 — 统一播放操作的服务器身份边界
+
+- 独立审查发现PlaybackPage.MatchesPlaybackAccount对整条BaseUrl忽略大小写，会把同host但大小写不同的路径视作同源。改用共享AccountIdentity.For规范化scheme/host/default port并保留路径大小写，以Ordinal比较身份并继续检查认证模式。
+- 补同host大小写规范化正例、路径大小写不同/无效URI反例，以及跨路径评分不写服务器、Play Me离线不导航的真实生产方法回归。队列39、页面89项通过，未改界面。
+- 普通包30首/180秒的原生运行再次回到了上一应用，尚未认证为稳定通过；前述3/21首探针运行未复现。PR保持草稿，继续以相同30首服务器队列和仅异常后记录再退出的临时探针定位，不将问题简单吞掉。
+
+## 2026-11-17 16:59:53 +08:00 — 收藏选择图标的原生路径边界
+
+- 普通包原生截图153-normal-favourites-artists.webp显示checklist越出圆框：WP8.1 PathIcon显式20×20不会自动将36×32的Data坐标按预期缩小，先前仅限制控件尺寸未解决实际图形边界。
+- 仅将FavouritesPage.xaml的三行check与横线路径坐标规范到20×20图标槽（实际范围x0–20、y0–19），保留PathIcon与系统AppBar圆框及真实多选行为，不增加像素偏移或另套自定义框。
+- 验证：手机源码/资源审计通过（59文件、21 XAML、230字符串查找、259资源、8原有资产）；该低影响路径修正未新增镜像实现的测试。修正后的最终普通包尚待Root重装并截图确认，153仅证明旧包问题，不作为修正通过证据。
+
+## 2026-11-17 17:03:49 +08:00 — 离线混音的最新选择与迟到验证
+
+- 修复已通过生产方法夹具复现的选择竞争：连续点击离线混音A、B时，较早的A验证若先返回，原代码会播放A并使B失效。现在单独维护选择代次，结合页面刷新代次与active状态，仅当前选择可以导航或报告错误；新点击、刷新和离页均拒绝旧验证结果。
+- 保留本地队列校验、完整重复歌曲顺序及现有Play Me呈现；当前缺失文件仍刷新列表并报错。刷新等待期间的新点击可以取代旧的缺文件提示，旧列表条目的迟到点击不会重新请求验证。下载卡片保留与离页取消流程不变。
+- 验证：tools/phone/run-offline.ps1通过36项生产离线存储回归及19项生产页面方法回归；页面测试原样编译OpenMixAsync、Refresh、OnNavigatedFrom及状态方法，覆盖最新点击、旧成功/失败/异常、刷新和离页、当前错误、下载占位与取消。手机源码资源审计通过59文件/21 XAML/230字符串/259资源/8原有资产，git diff --check通过。先前竞争反证与本次日志位于忽略目录.tmp/phone-review-proof。
+- 本次未运行SDK构建或设备输入；新的普通包原生复验仍待主任务完成。
+
+## 2026-11-17 17:08:23 +08:00 — 使用平台原生清单图标
+
+- 普通611包截图177确认：即使将路径坐标约束20×20，WP8.1 PathIcon的实际排列仍超出AppBar圆框，上一条路径缩小只通过源码检查，未通过原生验证。
+- 改用目标SDK明确支持的Symbol.List（Icon=List），保留原生命令栏尺寸、主题、按压与禁用状态，不添加模板补偿或像素偏移。
+- 验证：SDK头文件windows.ui.xaml.controls.h确认Symbol_List=57676；最终普通包将再次安装截图验证。本次仅替换图标，无新增低价值实现镜像测试。
+
+## 2026-11-17 17:18:08 +08:00 — 最终普通包截图、真实离线播放与验收边界
+
+- 普通7b包相同服务器30首/180秒队列逐段保存24帧，01–19持续推进，20–24停在末首0:06/0:06且Play可见、Next禁用。本轮无退出；此前两次意外离开应用原因未明，不宣称稳定性已修复，PR6继续草稿。临时异常后退出探针未记录异常，所有诊断源改动已还原，最终普通EXE/AppX扫描不含临时标记。
+- 普通7b长按保存A/B/A混音，ISE目录确为2份MP3(121422/121423字节)、cover和manifest。仅停止私有proxy后确认不可达，原生160/161/164依次实播A/B/A、166保留3项顺序，证明真实本地解码和下载去重不丢重复。代理随后隐藏恢复，ping/JPEG均200，限速归0；没有改动Navidrome进程。162/163是opening/restart画面，未当作暂停通过。
+- 最终7325a03普通包重新通过UI配置。214/215/216/218确认照片菜单、原生List完整圆内、收藏首组y230/首照片y316、最新动态首图y221、精选双列首行y216且无多余底栏。177明确证明前一PathIcon缩小方案仍失败，已排除。225粉色反馈层与OK返回226通过；227真实PlayMe离线入口、228下载4/30、229完成粉色卡，点卡后231实际播放；232/233连续观测同曲0:02且Play可见，暂停确认，缓存保留待复查。
+- 验证：最终产品源码14套CLR回归全通过，1237项计数断言及10项显式序列化检查；模型扫描31 OK/2预期SKIP。x86与ARM WP8.1 Debug XAML/PRI/AppX构建通过，原生运行仅x86。源码审计59文件/21 XAML/230字符串查找/259资源/8既有资产通过。732提交的push和PR CI required成功；文档提交后继续检查最新HEAD。
+- 文档补齐分包证据、失败帧排除、真实协议和本地缓存验证，最终6图压缩WebP总览与安全索引留在.tmp/ui-acceptance/2026-11-17/reference-composition。蓝色来自系统强调色，原始模板同样使用PhoneAccentBrush；品牌粉色复用原主题FFFF2E80。没有加入参考人物图片或夹具数据到产品资产。
+- 尚未认证：此前偶发退出根因、其它屏幕尺寸、ARM运行、锁屏/系统媒体中断、耳听输出及通过UI删除完整离线缓存。上述缺口和PR草稿状态均明确记录，没有把CLR或构建成功代替原生验收。
+
+## 2026-11-17 18:28:54 +08:00 — 实时歌曲进度与逆向字体排版修正
+
+- 用户明确首页2:56及顶部1:18都是当前歌曲进度，本轮按用户要求减少验证，后续由用户手工验收。核对逆向MiniPlayer、TrackProgressTemplateSelector、HoursAndMinutes/Seconds converters及EnhancedPhoneApplicationFrame：两处读取同一PlayPosition，不能作为封面或静态装饰。
+- 新增共享PhoneProgressCounter：观察器直接传TimeSpan?，不反解析本地化字符串；分钟/小时分钟与:秒分两列。使用原版Segoe WP Black字面字体、Normal字重和0字距；首页0.7透明度及124/94/68三档、顶栏0.1及91/91/78三档，逐项恢复固定秒列宽、负margin、自然测量与裁剪。顶部200×60只用作clip，不作为布局尺寸；Home的进度层独立于真实封面，缺封面时显示真实歌名。
+- 对齐标题栏SemiLight20、9左留白及进度可见时-60右留白；Mixes/收藏大标题SemiLight72、Normal、0字距，横向留白21/1并去掉WinRT重复的16左margin，保留WinRT垂直模板适配。菜单/首页标签恢复Semibold字体及22行高、BlockLineHeight、12边距；混音caption用Semibold21、22行高/44最大高，在60高背景带内居中，字体按页面比例缩放，不再随卡片宽度取整缩小。
+- 发现先前私有fixture对首页截图的封面裁剪误包含2:56。仅将3个受污染测试cover逐字节替换为已有干净Acceptance封面，修改私有准备脚本，隔离服务器fullScan完成；未重绘参考图、未修改产品资产。安全摘要.tmp/phone-emulator-fixture/reference-cover-repair-summary.json记录替换前后SHA。旧相关截图不再作为进度字体复刻依据。
+- 验证：手机源码/资源/包审计通过61文件、22 XAML、230字符串查找、267资源、8既有资产；x86 Debug旧SDK XAML/PRI/AppX构建通过，git diff --check通过。独立只读核对确认三档参数、DP初始化、自然测量及raw TimeSpan传递一致。没有重新部署、截图或跑长队列/整套手工回归；更新docs/mixradio/phone-reference-composition.md明确本轮由用户手动验收，旧运行证据仅对应旧包。
+
+## 2026-11-18 14:26:53 +08:00 — 对齐电脑端首页队列抽屉与工作区注册升级逻辑
+
+- 修复 `Client/Main/MainView.xaml` 首页队列抽屉方向与遮罩样式：此前提交 `d04c6e8` 仅更新了 `NavidromePlayerView.xaml`，而首页仍保留 `NullButtonStyle`（模板无背景绘制）与 `HorizontalAlignment="Right"`，与 `MixRadioQueuePanel` 的左侧 `PaneThemeTransition Edge="Left"` 及参考设计不一致。现合并 `MixRadioOverlayResources.xaml`，将 `QueueDrawer` 设为 `HorizontalAlignment="Left"`，并将 `QueueDismiss` 改为 `MixRadioDismissButtonStyle` + `Background="Black" Opacity="0.5"`。
+- 在 `tools/navidrome-tests/check-client.py` 增加对 `MainView.xaml` 与 `NavidromePlayerView.xaml` 的 `QueueDrawer` 左对齐及 `QueueDismiss` 样式检查。
+- 修复 `tools/desktop/run.ps1` 的外部工作区注册迁移条件：仅当现有注册在当前工作区外且新包版本不高于已注册版本时阻止覆盖；将 `Client/Package.appxmanifest` 版本升级至 `1.3.0.36`，使当前工作区可通过 `Add-AppxPackage -Register ... -ForceUpdateFromAnyVersion` 平滑接管注册并保留既有应用数据。
+- 验证：`python tools/mixradio/port_styles.py` 与 `python tools/mixradio/port_templates.py` 与入库字典一致；`python tools/navidrome-tests/check-client.py` 通过（291 项桌面字符串查找、469 项资源引用及队列抽屉检查）；`pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\navidrome-tests\run-home.ps1` 通过 76 项首页与导航断言；`git diff --check` 通过。尚未完成桌面端原生部署与渲染回归（将在下一步进行）。
+
+## 2026-11-18 15:03:45 +08:00 — 电脑端字标复刻、部署工具防陈旧打包及全套原生界面/播放/浮层回归
+
+- 修复首页 `Mixdrome` 字标尺寸与左对齐偏差：先前固定 `Width="266" Height="41"` 外层套用 `<Viewbox>` 将 `FontSize="52"` 的字标等比压缩（大写字母高度约 22px，且首字偏右），现重构 `tools/mixradio/port_templates.py` 与 `Client/Navidrome/NavidromeResources.xaml` 中的 `MixdromeWordmarkTemplate`（`FontSize="68"`、`Margin="-3,-33,0,-16"`，`Height="41"` 左上对齐），并移除 `Client/Main/MainView.xaml` / `MainView.xaml.cs` 中的固定宽度，改以 `MaxWidth`（宽屏 `360` / 窄屏 `Math.Max(160, ActualWidth - 132)`）、`Height`（`41` / `34`）与 `Margin`（`24` / `18`）紧贴圆形菜单按钮左对齐。
+- 修复 `tools/desktop/NativeUiProbe.cs` 在小曲库分组下的分页判定：以 `pagingSelection != null && indexedModel.CanLoadMore` 记录 `pagingTested`，避免测试夹具仅有 6 张专辑/3 名艺术家/3 个流派时误报分页状态；`songs` 真实触发 `100 -> 127` 增量加载并保持选择状态。
+- 修复 `tools/desktop/run.ps1` 陈旧 `.appx` 与覆盖写丢失权限导致的激活挂起（`MoAppHang` / DCOM 超时）：始终使用 `/t:Rebuild` 与 `/p:GenerateAppxPackageOnBuild=true`，部署前校验已选 `.appx` 内 `Mixdrome.exe` 与编译输出目录 `Mixdrome.exe` 的 SHA-256 一致性；当布局目录发生文件更新（`$updatedFiles -gt 0`）时不再复用 `$registrationReused`，确保 `Add-AppxPackage -Register` 重建 AppContainer 访问权限。
+- 完成桌面端全套原生 XAML 回归（隔离测试服务器 `http://127.0.0.1:2845/`，先清理夹具 95 个缓存图片并刷新 9 份歌单封面清除旧 `2:56` 拼贴）：
+  - `NativeUiProbe`（`20261118T065115Z`）：34 页采集零错误、4 项字母索引/分页（含 `songs` 100→127）、错误遮罩与库菜单全部通过，`outsideCardTexts=0`；实测 `home.png` 字标白色包围盒 `x=123..379, y=50..100`（高 `51px`）、窄屏 `home-narrow.png` `x=42..319, y=52..93`（高 `42px`）无裁切，`home-library.png` 歌单瓷砖呈现整洁封面。
+  - `NativePlaybackProbe`：本地 PCM 与 `1744/900/500` 三档播放器布局及拖拽预览共 29 项断言全部通过。
+  - 临时浮层回归（验证后已通过 `git checkout` 精确还原 `tools/desktop/NativePlaybackProbe.cs` 原始 SHA-256 `8904A7769886195A96B6E488472B9B4950E782046C4D489EB636E60F4883899B`）：53 项断言全通过，覆盖 `1744/900/500` 专辑弹层重排、队列 `58+10` 行距与 `NavidromePlayerView` / `MainView` 双页左侧 `300px` 队列抽屉及 `0.5` 黑色遮罩开闭交互。
+- 验证：已重编并部署 `normal` 模式桌面端包（`.tmp/desktop/build-mode-AnyCPU-Debug.txt` 为 `normal`，产物 `Mixdrome.exe` 不含任何探针符号且正常启动至主页）；`python tools/mixradio/port_templates.py`、`python tools/navidrome-tests/check-client.py`（291 项字符串、469 项资源及队列抽屉检查）、`tools/navidrome-tests/run-home.ps1`（76 项断言）与 `git diff --check` 全部通过。
+
+## 2026-11-18 15:08:50 +08:00 — 对齐手机端离线精选集、创建混音与子页面顶部栏排版
+
+- 对齐 `Client.Phone/Views/OfflineMixesPage.xaml` 与 `OfflineMixesPage.xaml.cs`：大标题 `PageTitle` 改用 `PhoneReferenceSemiLightFontFamily`、`72` 字号缩放、`Normal` 字重与 `0` 字距并消除偏移差异；卡片底栏改为 `60` 高容器中垂直居中排版（`PhoneReferenceSemiBoldFontFamily`、`21` 字号、`22` 行高、`44` 最大高、`BlockLineHeight`、`WordEllipsis`），普通卡片保留 `0.6` 强调色蒙层，`play me` 卡片保持无额外半透明条并与 `MixesPage` 字号按页面比例缩放（保留 2 参默认兼容）。
+- 对齐 `Client.Phone/Views/CreateMixPage.xaml` 与 `CreateMixPage.xaml.cs`：`PageTitle` 改用 `PhoneReferenceSemiLightFontFamily` 与按 `ActualWidth / 480` 缩放的 `72` 字号大标题。
+- 统一子页面顶部栏与高对比搜索框：`LibraryPage`、`SearchPage`、`AlbumPage`、`ArtistAlbumsPage` 与 `GenreSongsPage` 均接入共享 `<common:PhoneTitleBar />`（复用现有 `.resw` `UiMyMusic` / `UiSearch` 资源，移除遗留 `MixRadioWordmarkTextStyle` / 小图标占位）；`SearchTextBox` 启用 `MixRadioPhoneTextBoxStyle`；`LibraryPage` 与 `SearchPage` 枢纽页签采用 `PhoneReferenceSemiLightFontFamily` `54` 标题模板；`tools/phone/LibraryTests.cs` 与 `SearchTests.cs` 补充最小 `PhoneTitleBar` 测试存根。
+- 验证：`python tools/phone/check.py` 通过（61 文件、22 XAML、235 字符串、259 资源、8 既有资产）；7 项手机端生产 CLR 套件全部通过（`run-collections` 19、`run-connection` 38+13、`run-library` 39、`run-listening` 36、`run-offline` 36+19、`run-playback` 39+89、`run-search` 15）；`x86` 与 `ARM` Debug 原生 WP8.1 SDK 重建均通过，`git diff --check` 通过。真机/模拟器部署与截屏回归将在下一步执行。
+
+## 2026-11-18 15:35:51 +08:00 — 修复离线混音移除时的文件句柄锁定（E_ACCESSDENIED）与首页未配置状态条
+
+- 真机/模拟器长按回归暴露问题：在 WP8.1 WVGA 模拟器将 `Test tone` 离线保存完成并触发长按菜单 `remove offline mix` 时，页面弹出 `Access is denied. (0x80070005)`。定位为 `OfflineMixesPage.xaml` 内 `<Image Source="{Binding Artwork}" />` 持续持有 `ms-appdata:///local/phone-offline-mixes/.../cover.jpg` 只读锁，而 `PhoneOfflineMixes.DeleteMixAsync` 先前直接调用 `folder.DeleteAsync(StorageDeleteOption.PermanentDelete)`，在封面或后台音轨被占用时整个目录删除被拒绝且未先移除 `manifest.xml`。
+- 修复方案：
+  - `Client.Phone/Services/PhoneOfflineMixes.cs`：在 `DownloadGate` 内串行执行 `DeleteMixAsync`，匹配修订后**先删除 `manifest.xml`** 立即原子取消发布，再逐个删除目录文件及目录本身并仅忽略锁定异常；新增 `SweepUnpublishedFoldersAsync` 在删除后与下次 `SaveMixAsync` 前清理已释放句柄的无清单残余目录。
+  - `Client.Phone/Views/OfflineMixesPage.xaml.cs`：为 `PhoneOfflineCard.Artwork` 增加属性变更通知；点击 `remove offline mix` 前先置空 `card.Artwork`、从 `Cards` 移除卡片并让出渲染帧，释放 XAML 图片句柄后再删除；保留 `run-offline.ps1` 提取的 5 个核心方法签名不变。
+  - `Client.Phone/Views/MainPage.xaml` / `MainPage.xaml.cs`：将首页底部 `StatusText`/`LoadingIndicator` 包裹在按需显示的深色半透明 `StatusBanner` 中，消除未配置服务器时提示语与 `recently played` 的重叠。
+  - `tools/phone/OfflineStorageAdapters.cs` 与 `OfflineMixTests.cs`：补充 `StorageFolder.GetFilesAsync`/`StorageFile.Name` 适配器与真实文件句柄锁定期间的删除回归断言。
+- 将 `Client.Phone/Package.appxmanifest` 升至 `1.3.0.1` 以支持模拟器保留凭据与离线缓存就地 `/updatelaunch`。验证：`python tools/phone/check.py`、全部 7 项手机 CLR 回归（含 `run-offline.ps1` `37+19` 断言）、`x86` 与 `ARM` Debug 原生重建及 `git diff --check` 全部通过。
+
+## 2026-11-18 16:29:12 +08:00 — 修复手机端 DirectWrite Segoe WP 字重回退、顶栏紧凑进度基线与播放跳转安全性
+
+- 修复 WP8.1 WinRT DirectWrite 字重回退：实测主机 `SegoeWP*.ttf` 全部注册在同一家族名 `'Segoe WP'` 下（以字重 `Light`/`SemiLight`/`SemiBold`/`Black` 区分）。原 `Client.Phone/Common/Styles.xaml` 将 `PhoneReference*FontFamily` 设为 `Segoe WP Light`/`SemiLight`/`Semibold`/`Black` 并配以 `FontWeight="Normal"`，导致模拟器实机截图中首页与顶栏进度数字及卡片标题退化为细 Regular 字体。现将 `PhoneReference*FontFamily` 统一为 `Segoe WP`（并在 `tools/phone/check.py` 新增禁止 XAML 使用子族名正则校验），同时为以下控件补齐显式 `FontWeight`：`PhoneProgressCounter.xaml`（`Black`）、`Styles.xaml` `PhoneTileLabelStyle` 与 `PhoneHomePanel.xaml` `CurrentTitle` 及 `MixesPage.xaml`/`OfflineMixesPage.xaml` 卡片标题（`SemiBold`）、`PhoneTitleBar.xaml` `TitleText` 及各页 `72`/`54` 大标题（`SemiLight`）。
+- 修复 `PhoneProgressCounter.xaml.cs` 在顶栏紧凑模式（`IsCompact`）的 WinRT `typo` 度量偏移与裁切：`Height = 60 * scale`、`Digits.VerticalAlignment = VerticalAlignment.Top`、`Margin` 上移至 `-19`（`longTime` `-13`）、`Clip` 对齐 `(0, 0, 200 * scale, 60 * scale)`，使 `91px` 黑色数字底边紧贴顶栏底部并消除上方 6px 空隙（`!IsCompact` 时显式恢复 `Height = double.NaN` 与 `VerticalAlignment = VerticalAlignment.Stretch`）。
+- 加固顶栏快捷跳转与异步状态回调安全：`PhonePlaybackObserver.StartAsync` 捕获 `SessionFile` 读取瞬态异常；`PhoneTitleBar.xaml.cs` 提取 `StopObserver()`，在 `OnHomeClick` 与 `OnElapsedClick` 发起 `Frame.Navigate` 前同步卸载后台监听（并在 `OnUnloaded` 复用）；`PlaybackPage.xaml.cs` `OnMediaStateChanged` 在 `Dispatcher.RunAsync` 回调内部用 `try/catch` 包裹 `UpdatePlaybackState()`（保持 `UpdateProgress`/`OnProgressTimerTick` 既有 `COMException` 语义与测试兼容）；`App.xaml.cs` `UpdateStatusBarVisibility` 增加 `catch (Exception)` 防止系统状态栏切换瞬态异常逃逸 `async void`。
+- 升级 `Client.Phone/Package.appxmanifest` 至 `1.3.0.2`。验证：`python tools/phone/check.py` 通过（61 文件、22 XAML、236 字符串、259 资源、8 资产）、全部 7 套手机 CLR 测试通过（`run-connection` 38+13、`run-playback` 39+89、`run-listening` 36、`run-library` 39、`run-search` 15、`run-collections` 19、`run-offline` 37+19）、`Client.Phone` `x86` 与 `ARM` Debug Clean Rebuild 通过、`git diff --check` 通过。接下来将在 WP8.1 WVGA 模拟器清理卸载重装 `1.3.0.2` 验证新字重、紧凑进度裁剪与 `PhoneTitleBar` 快捷跳转。
+
+## 2026-11-19 21:04:42 +08:00 — 接手 Antigravity 手机与桌面 UI 原生复验
+
+- 沿用包含 origin/main 的现有 PR #6 分支，验证产品源码 7448e76，补充 docs/mixradio/ui-regression-2026-11-19.md。独立保存本轮证据，避免以前轮截图替代当前包验收。
+- 桌面 NativeUiProbe 34 页面零页面错误、四组索引及歌曲 100→127 分页通过；NativePlaybackProbe 29 项通过。最后恢复 normal 普通构建并部署。
+- 安装手机普通 1.3.0.2 x86 包，复测菜单、混音、收藏、曲库、搜索、创建页、专辑、空离线页及顶栏导航。90 秒 MP3 的首页 0:26、顶栏 1:06 和播放器 1:20 进度均取得 WebP 证据。
+- 发现未通过项：未配置首页提示条仍覆盖末行内容；播放到 1:20 的最后观察后发送暂停点击，随后黑屏并进入 Photos，再启动恢复首页。未取得异常栈，暂不能归因于暂停或曲目切换，手机稳定性继续未通过。
+- 验证：14 套 CLR、手机与桌面源码资源审计通过。仅认证实际执行范围，其它手机尺寸、ARM 运行、锁屏、完整离线流程仍待验证。原始截图、压缩 WebP、诊断报告与日志位于忽略目录 .tmp/ui-acceptance/2026-11-19。此次仅修改验收记录。

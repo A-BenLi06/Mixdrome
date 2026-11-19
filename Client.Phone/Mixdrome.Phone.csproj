@@ -280,4 +280,20 @@
     <PRIResource Include="Strings\zh-CN\Resources.resw"><Generator>MSBuild:Compile</Generator></PRIResource>
 
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\PhoneTitleBar.xaml.cs"><DependentUpon>PhoneTitleBar.xaml</DependentUpon></Compile>
+    <Page Include="Common\PhoneTitleBar.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Compile Include="Services\PhonePlaybackObserver.cs" />
+      <Compile Include="Common\PhoneProgressCounter.xaml.cs"><DependentUpon>PhoneProgressCounter.xaml</DependentUpon></Compile>
+      <Page Include="Common\PhoneProgressCounter.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Compile Include="Services\PhoneCollectionPresentation.cs" />
+    <Compile Include="Services\PhoneOfflineManifest.cs" />
+    <Compile Include="Services\PhoneOfflineMixes.cs" />
+    <Compile Include="Views\MixesPage.xaml.cs"><DependentUpon>MixesPage.xaml</DependentUpon></Compile>
+    <Page Include="Views\MixesPage.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Compile Include="Views\CreateMixPage.xaml.cs"><DependentUpon>CreateMixPage.xaml</DependentUpon></Compile>
+    <Page Include="Views\CreateMixPage.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Compile Include="Views\OfflineMixesPage.xaml.cs"><DependentUpon>OfflineMixesPage.xaml</DependentUpon></Compile>
+    <Page Include="Views\OfflineMixesPage.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+  </ItemGroup>
 </Project>

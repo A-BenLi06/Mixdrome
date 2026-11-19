@@ -1,0 +1,15 @@
+<UserControl x:Class="Mixdrome.Phone.Common.PhoneTitleBar" x:Name="TitleBarControl" Background="#B3303030" Canvas.ZIndex="1"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Mixdrome.Phone.Common">
+ <Grid x:Name="Bar" Background="{Binding Background, ElementName=TitleBarControl}" SizeChanged="OnBarSizeChanged">
+  <Grid.ColumnDefinitions><ColumnDefinition x:Name="HomeColumn" Width="60"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+  <Button x:Name="HomeButton" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Style="{StaticResource MixRadioFlatButtonStyle}" Click="OnHomeClick">
+   <Viewbox x:Name="HomeGlyph" Width="25" Height="25"><Path Fill="White" Data="M0,0 L25,0 25,10 0,10 Z M0,15 L10,15 10,25 0,25 Z M15,15 L25,15 25,25 15,25 Z"/></Viewbox>
+  </Button>
+  <Rectangle x:Name="Divider" Width="1" Height="44" Fill="#4DFFFFFF" HorizontalAlignment="Right"/>
+  <Button x:Name="ElapsedButton" Grid.Column="2" HorizontalAlignment="Right" Style="{StaticResource MixRadioFlatButtonStyle}" Click="OnElapsedClick">
+   <local:PhoneProgressCounter x:Name="ElapsedProgress" IsCompact="True"/>
+  </Button>
+  <TextBlock x:Name="TitleText" Grid.Column="1" VerticalAlignment="Center" FontFamily="{StaticResource PhoneReferenceSemiLightFontFamily}" FontWeight="SemiLight" Foreground="White" IsHitTestVisible="False" TextTrimming="WordEllipsis"/>
+ </Grid>
+</UserControl>
